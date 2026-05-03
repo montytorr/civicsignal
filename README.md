@@ -4,6 +4,7 @@ Status: active
 Owner: Cal / Clawdius
 Created: 2026-05-03
 Category: civic-tech
+Private GitHub repo: https://github.com/montytorr/civicsignal
 
 ## Goal
 
@@ -490,6 +491,7 @@ My favorite: CivicSignal. It says what it does without sounding like a DAO from 
 - 2026-05-03: Chain should be invisible/free to users at launch. Use off-chain app DB + cryptographic audit commitments, with optional low-cost chain anchoring later.
 - 2026-05-03: Cal agreed chain costs, if/when anchoring is enabled, are paid by the platform via backend wallet — no user gas, no wallet requirement, no tokenomics.
 - 2026-05-03: Chain lives beside the app as a thin audit layer: commitment service + L2 anchoring contract + public verifier, not as the core product UX.
+- 2026-05-03: Created private GitHub repo at https://github.com/montytorr/civicsignal and seeded it with the updated project/design markdown docs.
 - 2026-05-03: Reputation is non-transferable, topic-specific, and only increases on correct/winning outcomes.
 - 2026-05-03: Product should lead with democracy/civic legitimacy, not crypto/token language.
 - 2026-05-03: Working name is CivicSignal.
