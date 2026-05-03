@@ -475,10 +475,10 @@ My favorite: CivicSignal. It says what it does without sounding like a DAO from 
 
 ## Immediate TODO
 
-- [ ] Choose working name.
-- [ ] Decide first beta domain: world events vs local/EU civic.
-- [ ] Draft poll schema and reputation formula.
-- [ ] Create product spec from this project file.
+- [x] Choose working name: CivicSignal.
+- [x] Decide first beta domain: global civic/world events.
+- [x] Draft poll schema and reputation formula: see `docs/MVP_SCHEMA.md`.
+- [x] Create product spec from this project file: see `docs/PRODUCT_SPEC.md`.
 - [ ] Build landing page prototype.
 - [ ] Build database schema.
 - [ ] Build MVP voting flow.
@@ -500,7 +500,9 @@ My favorite: CivicSignal. It says what it does without sounding like a DAO from 
 - 2026-05-03: Votes are hidden until poll cutoff to reduce herding.
 - 2026-05-03: Positioning is public-good civic platform.
 - 2026-05-03: Project should be open-source by default.
+- 2026-05-03: First beta domain should be global civic/world events, not France/EU-only.
+- 2026-05-03: MVP product spec and MVP schema/reputation draft were created in `docs/PRODUCT_SPEC.md` and `docs/MVP_SCHEMA.md`.
 
 ## Current Status
 
-Project plan created. Next step is to pick a working name and turn this into a product spec + MVP schema.
+Project plan, design brief, MVP product spec, and MVP schema/reputation draft are ready. Next step is implementation: landing prototype, database schema, voting flow, verification v1, admin resolution, and methodology page.
