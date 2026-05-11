@@ -21,4 +21,4 @@ COPY packages/crypto  ./packages/crypto
 COPY services/resolver ./services/resolver
 
 # tsx is available via the resolver's devDependencies (installed above)
-CMD ["node", "--import", "tsx/esm", "services/resolver/src/index.ts"]
+CMD ["pnpm", "--filter", "@civicsignal/resolver", "start"]

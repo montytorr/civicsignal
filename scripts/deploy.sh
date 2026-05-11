@@ -18,6 +18,16 @@ mkdir -p apps/web/public
 
 corepack pnpm install --frozen-lockfile
 corepack pnpm -r test
+
+ENV_FILE=${ENV_FILE:-/home/runner/civicsignal-secrets/web.env}
+if [ ! -f "$ENV_FILE" ]; then
+  echo "Missing env file: $ENV_FILE" >&2
+  exit 1
+fi
+set -a
+. "$ENV_FILE"
+set +a
+
 corepack pnpm --filter @civicsignal/web build
 
 docker compose build web resolver
