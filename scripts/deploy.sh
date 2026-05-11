@@ -5,6 +5,9 @@ APP_DIR=${APP_DIR:-/root/projects/civicsignal}
 cd "$APP_DIR"
 
 git config --global --add safe.directory "$APP_DIR" 2>/dev/null || true
+if [ -n "${GITHUB_TOKEN:-}" ]; then
+  git remote set-url origin "https://x-access-token:${GITHUB_TOKEN}@github.com/montytorr/civicsignal.git"
+fi
 
 git fetch origin main
 git reset --hard origin/main
