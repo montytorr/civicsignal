@@ -1,0 +1,43 @@
+name: Deploy CivicSignal
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+env:
+  DISCORD_WEBHOOK_URL: ${{ secrets.DISCORD_WEBHOOK_URL }}
+
+jobs:
+  deploy:
+    runs-on: [self-hosted, civicsignal]
+    timeout-minutes: 20
+    if: "!contains(github.event.head_commit.message, '[skip ci]')"
+
+    steps:
+      - name: Deploy latest main on internal runner
+        id: deploy
+        run: |
+          set -euo pipefail
+          /root/projects/civicsignal/scripts/deploy.sh | tee /tmp/civicsignal-deploy.log
+          echo "summary=$(tail -1 /tmp/civicsignal-deploy.log)" >> "$GITHUB_OUTPUT"
+
+      - name: Notify Discord success
+        if: success()
+        run: |
+          COMMIT_MSG=$(cd /root/projects/civicsignal && git log -1 --format='%h %s')
+          BODY=$(jq -n --arg content "✅ **CivicSignal deployed** — \`${COMMIT_MSG}\`\n🌐 <https://civicsignal.montytorr.tech>" '{content:$content}')
+          curl -sf -X POST "$DISCORD_WEBHOOK_URL" \
+            -H "Content-Type: application/json" \
+            -H "User-Agent: CivicSignal-CI/1.0" \
+            -d "$BODY" || true
+
+      - name: Notify Discord failure
+        if: failure()
+        run: |
+          COMMIT_MSG=$(cd /root/projects/civicsignal && git log -1 --format='%h %s' 2>/dev/null || echo "unknown")
+          BODY=$(jq -n --arg content "❌ **CivicSignal deploy FAILED** — \`${COMMIT_MSG}\`\nCheck: <https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}>" '{content:$content}')
+          curl -sf -X POST "$DISCORD_WEBHOOK_URL" \
+            -H "Content-Type: application/json" \
+            -H "User-Agent: CivicSignal-CI/1.0" \
+            -d "$BODY" || true

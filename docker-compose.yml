@@ -3,10 +3,21 @@ services:
     build:
       context: .
       dockerfile: Dockerfile
-    ports:
-      - "3000:3000"
-    env_file: ./apps/web/.env.local
+    image: civicsignal-web:latest
+    container_name: civicsignal-web
+    expose:
+      - "3000"
+    env_file: /home/runner/civicsignal-secrets/web.env
     restart: unless-stopped
+    networks:
+      - trading-v2-network
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.civicsignal.rule=Host(`civicsignal.montytorr.tech`)"
+      - "traefik.http.routers.civicsignal.entrypoints=websecure"
+      - "traefik.http.routers.civicsignal.tls.certresolver=letsencrypt"
+      - "traefik.http.services.civicsignal.loadbalancer.server.port=3000"
+      - "traefik.docker.network=trading-v2-network"
     healthcheck:
       test: ["CMD", "wget", "--quiet", "--tries=1", "--spider", "http://localhost:3000/api/health"]
       interval: 30s
@@ -18,8 +29,16 @@ services:
     build:
       context: .
       dockerfile: Dockerfile.resolver
-    env_file: ./apps/web/.env.local
+    image: civicsignal-resolver:latest
+    container_name: civicsignal-resolver
+    env_file: /home/runner/civicsignal-secrets/web.env
     restart: unless-stopped
+    networks:
+      - trading-v2-network
     depends_on:
       web:
         condition: service_healthy
+
+networks:
+  trading-v2-network:
+    external: true
