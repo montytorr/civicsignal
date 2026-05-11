@@ -4,6 +4,8 @@ set -euo pipefail
 APP_DIR=${APP_DIR:-/root/projects/civicsignal}
 cd "$APP_DIR"
 
+git config --global --add safe.directory "$APP_DIR" 2>/dev/null || true
+
 git fetch origin main
 git reset --hard origin/main
 
