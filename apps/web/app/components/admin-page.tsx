@@ -156,7 +156,9 @@ export const AdminPage = ({
     'Resolves YES if the IPCC publishes the AR7 Synthesis Report on ipcc.ch on or before 23:59 UTC, 31 Dec 2026. Resolves NO otherwise. Pre-publication leaks do not count.'
   )
   const [publishing, setPublishing] = useState(false)
+  const [savingDraft, setSavingDraft] = useState(false)
   const [error, setError] = useState<string | null>(null)
+  const [notice, setNotice] = useState<string | null>(null)
   const [disputeList, setDisputeList] = useState<Dispute[]>(disputes)
   const [disputeLoading, setDisputeLoading] = useState<string | null>(null)
   const [awaitingResolution, setAwaitingResolution] = useState<AwaitingPoll[]>(initialAwaitingResolution)
@@ -210,23 +212,56 @@ export const AdminPage = ({
     }
   }
 
-  const handlePublish = async () => {
-    setPublishing(true)
+  const buildPollPayload = () => ({
+    question,
+    topicId,
+    region,
+    options: options.filter((o) => o.trim()),
+    sourceOfTruth,
+    resolutionCriteria,
+    cutoffAt: new Date(cutoffAt.trim()).toISOString(),
+    resolvesAt: new Date(resolvesAt.trim()).toISOString(),
+  })
+
+  const resetCreateForm = () => {
+    setQuestion('')
+    setOptions(['Yes', 'No'])
+    setSourceOfTruth('')
+    setResolutionCriteria('')
+  }
+
+  const handleSaveDraft = async () => {
+    setSavingDraft(true)
     setError(null)
+    setNotice(null)
     try {
       const createRes = await fetch('/api/admin/polls', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          question,
-          topicId,
-          region,
-          options: options.filter((o) => o.trim()),
-          sourceOfTruth,
-          resolutionCriteria,
-          cutoffAt: new Date(cutoffAt.trim()).toISOString(),
-          resolvesAt: new Date(resolvesAt.trim()).toISOString(),
-        }),
+        body: JSON.stringify(buildPollPayload()),
+      })
+      const createData = await createRes.json()
+      if (!createRes.ok || !createData.success) {
+        setError(createData.error ?? 'Failed to save draft')
+        return
+      }
+      setNotice(`Draft saved · ${createData.data.poll.id}`)
+    } catch {
+      setError('Network error — please try again')
+    } finally {
+      setSavingDraft(false)
+    }
+  }
+
+  const handlePublish = async () => {
+    setPublishing(true)
+    setError(null)
+    setNotice(null)
+    try {
+      const createRes = await fetch('/api/admin/polls', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(buildPollPayload()),
       })
       const createData = await createRes.json()
       if (!createRes.ok || !createData.success) {
@@ -240,11 +275,8 @@ export const AdminPage = ({
         setError(publishData.error ?? 'Failed to publish poll')
         return
       }
-      // Reset form on success
-      setQuestion('')
-      setOptions(['Yes', 'No'])
-      setSourceOfTruth('')
-      setResolutionCriteria('')
+      setNotice(`Poll published · ${pollId}`)
+      resetCreateForm()
     } catch {
       setError('Network error — please try again')
     } finally {
@@ -288,6 +320,18 @@ export const AdminPage = ({
             color: 'var(--color-parchment-amber)',
           }}>
             {error}
+          </div>
+        )}
+
+        {notice && (
+          <div style={{
+            marginTop: 16, padding: '12px 16px',
+            background: 'var(--color-parchment-surface)',
+            border: '1px solid var(--color-parchment-green)',
+            borderRadius: 3, fontSize: 13,
+            color: 'var(--color-parchment-green)',
+          }}>
+            {notice}
           </div>
         )}
 
@@ -443,8 +487,10 @@ export const AdminPage = ({
                 Will be committed to public log on publish
               </span>
               <div style={{ display: 'flex', gap: 10 }}>
-                <Btn kind="ghost" size="md">Save draft</Btn>
-                <Btn kind="primary" size="md" onClick={handlePublish} disabled={publishing}>
+                <Btn kind="ghost" size="md" onClick={handleSaveDraft} disabled={savingDraft || publishing}>
+                  {savingDraft ? 'Saving…' : 'Save draft'}
+                </Btn>
+                <Btn kind="primary" size="md" onClick={handlePublish} disabled={publishing || savingDraft}>
                   {publishing ? 'Publishing…' : 'Publish poll →'}
                 </Btn>
               </div>
