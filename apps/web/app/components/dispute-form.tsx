@@ -9,6 +9,8 @@ interface Props {
 
 export const DisputeForm = ({ pollId }: Props) => {
   const [reason, setReason] = useState('')
+  const [evidenceUrl, setEvidenceUrl] = useState('')
+  const [evidenceSummary, setEvidenceSummary] = useState('')
   const [submitting, setSubmitting] = useState(false)
   const [success, setSuccess] = useState(false)
   const [error, setError] = useState<string | null>(null)
@@ -21,7 +23,7 @@ export const DisputeForm = ({ pollId }: Props) => {
       const res = await fetch(`/api/polls/${pollId}/dispute`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ reason: reason.trim() }),
+        body: JSON.stringify({ reason: reason.trim(), evidenceUrl: evidenceUrl.trim() || undefined, evidenceSummary: evidenceSummary.trim() || undefined }),
       })
       const data = await res.json()
       if (!res.ok || !data.success) {
@@ -61,13 +63,13 @@ export const DisputeForm = ({ pollId }: Props) => {
             RESOLUTION FLAGGED
           </div>
           <p style={{ margin: 0, fontSize: 12, color: 'var(--color-parchment-muted)', lineHeight: 1.5 }}>
-            Your dispute has been submitted for review.
+            Your dispute and evidence packet have been submitted for panel review.
           </p>
         </div>
       ) : (
         <>
           <p style={{ margin: '10px 0 12px', fontSize: 12, color: 'var(--color-parchment-muted)', lineHeight: 1.5 }}>
-            Believe this resolution is incorrect? Provide your reasoning below. Requires topic reputation.
+            Believe this resolution is incorrect? Provide your reasoning and any source evidence. Requires topic reputation.
           </p>
           <textarea
             value={reason}
@@ -78,6 +80,44 @@ export const DisputeForm = ({ pollId }: Props) => {
               minHeight: 80,
               padding: '10px 12px',
               fontSize: 13,
+              fontFamily: 'inherit',
+              color: 'var(--color-parchment-ink)',
+              background: 'var(--color-parchment-bg)',
+              border: '1px solid var(--color-parchment-line)',
+              borderRadius: 3,
+              resize: 'vertical',
+              outline: 'none',
+              boxSizing: 'border-box',
+            }}
+          />
+          <input
+            value={evidenceUrl}
+            onChange={(e) => setEvidenceUrl(e.target.value)}
+            placeholder="Evidence URL (optional)"
+            style={{
+              width: '100%',
+              marginTop: 8,
+              padding: '9px 12px',
+              fontSize: 12.5,
+              fontFamily: 'inherit',
+              color: 'var(--color-parchment-ink)',
+              background: 'var(--color-parchment-bg)',
+              border: '1px solid var(--color-parchment-line)',
+              borderRadius: 3,
+              outline: 'none',
+              boxSizing: 'border-box',
+            }}
+          />
+          <textarea
+            value={evidenceSummary}
+            onChange={(e) => setEvidenceSummary(e.target.value)}
+            placeholder="Evidence summary (optional — quote the exact source language if useful)"
+            style={{
+              width: '100%',
+              minHeight: 58,
+              marginTop: 8,
+              padding: '9px 12px',
+              fontSize: 12.5,
               fontFamily: 'inherit',
               color: 'var(--color-parchment-ink)',
               background: 'var(--color-parchment-bg)',
@@ -112,7 +152,7 @@ export const DisputeForm = ({ pollId }: Props) => {
               letterSpacing: '0.02em',
             }}
           >
-            {submitting ? 'Submitting…' : 'Submit dispute'}
+            {submitting ? 'Submitting…' : 'Submit evidence'}
           </button>
         </>
       )}

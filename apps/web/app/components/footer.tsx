@@ -11,6 +11,7 @@ const PLATFORM_LINKS = [
 const PROJECT_LINKS = [
   { label: 'Governance', href: '/roadmap#governance' },
   { label: 'Leaderboard', href: '/leaderboard' },
+  { label: 'Trusted panels', href: '/panels' },
   { label: 'Archive', href: '/archive' },
   { label: 'Invites', href: '/invites' },
 ]

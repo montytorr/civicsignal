@@ -219,7 +219,7 @@ export const getOpenDisputes = async () => {
   const supabase = await createClient()
   const { data } = await (supabase as any)
     .from('disputes')
-    .select('*, polls(question)')
+    .select('*, polls(question, topic_id, topics(label))')
     .in('status', ['open', 'reviewing'])
     .order('created_at', { ascending: false }) as {
     data: Array<{
@@ -230,10 +230,42 @@ export const getOpenDisputes = async () => {
       status: string
       created_at: string
       resolved_at: string | null
-      polls: { question: string } | null
+      polls: { question: string; topic_id: string; topics: { label: string } | null } | null
     }> | null
   }
-  return data ?? []
+
+  const disputes = data ?? []
+  const ids = disputes.map((d) => d.id)
+  if (ids.length === 0) return []
+
+  const [evidenceRes, reviewRes] = await Promise.all([
+    (supabase as any).from('dispute_evidence').select('*').in('dispute_id', ids).order('created_at').then((r: any) => r).catch(() => ({ data: [] })),
+    (supabase as any).from('dispute_reviews').select('*, profiles(handle)').in('dispute_id', ids).order('created_at').then((r: any) => r).catch(() => ({ data: [] })),
+  ]) as [
+    { data: Array<{ id: string; dispute_id: string; submitted_by: string; summary: string; source_url: string | null; created_at: string }> | null },
+    { data: Array<{ id: string; dispute_id: string; reviewer_id: string; decision: string; rationale: string; created_at: string; profiles: { handle: string } | null }> | null },
+  ]
+
+  return disputes.map((d) => ({
+    ...d,
+    evidence: (evidenceRes.data ?? []).filter((e) => e.dispute_id === d.id),
+    reviews: (reviewRes.data ?? []).filter((r) => r.dispute_id === d.id),
+  }))
+}
+
+export const getPanelTransparency = async () => {
+  const supabase = await createClient()
+  const [members, evidence, reviews] = await Promise.all([
+    (supabase as any).from('panel_members').select('*, topics(label, slug), profiles(handle)').order('invited_at', { ascending: false }).limit(50).then((r: any) => r).catch(() => ({ data: [] })),
+    (supabase as any).from('dispute_evidence').select('*, disputes(poll_id, status, polls(question))').order('created_at', { ascending: false }).limit(50).then((r: any) => r).catch(() => ({ data: [] })),
+    (supabase as any).from('dispute_reviews').select('*, profiles(handle), disputes(poll_id, status, polls(question))').order('created_at', { ascending: false }).limit(50).then((r: any) => r).catch(() => ({ data: [] })),
+  ])
+
+  return {
+    members: members.data ?? [],
+    evidence: evidence.data ?? [],
+    reviews: reviews.data ?? [],
+  }
 }
 
 export const getPollPublicKey = async (pollId: string) => {

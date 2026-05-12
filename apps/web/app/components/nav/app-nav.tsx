@@ -12,6 +12,7 @@ const BASE_TABS = [
   { label: 'Methodology', href: '/methodology' },
   { label: 'Roadmap', href: '/roadmap' },
   { label: 'Leaderboard', href: '/leaderboard' },
+  { label: 'Panels', href: '/panels' },
   { label: 'Archive', href: '/archive' },
 ]
 

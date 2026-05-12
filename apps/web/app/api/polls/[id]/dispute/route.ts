@@ -29,7 +29,7 @@ export const POST = async (req: Request, { params }: Params) => {
     }
 
     const body = await req.json()
-    const { reason } = body
+    const { reason, evidenceUrl, evidenceSummary } = body
 
     if (!reason || typeof reason !== 'string' || reason.trim().length === 0) {
       return NextResponse.json(
@@ -41,6 +41,20 @@ export const POST = async (req: Request, { params }: Params) => {
     if (reason.trim().length > 1000) {
       return NextResponse.json(
         { success: false, error: 'reason must be 1000 characters or fewer', code: 'INVALID_BODY' },
+        { status: 400 }
+      )
+    }
+
+    if (evidenceUrl !== undefined && (typeof evidenceUrl !== 'string' || evidenceUrl.length > 500)) {
+      return NextResponse.json(
+        { success: false, error: 'evidenceUrl must be a URL string (max 500 chars)', code: 'INVALID_BODY' },
+        { status: 400 }
+      )
+    }
+
+    if (evidenceSummary !== undefined && (typeof evidenceSummary !== 'string' || evidenceSummary.length > 1000)) {
+      return NextResponse.json(
+        { success: false, error: 'evidenceSummary must be a string (max 1000 chars)', code: 'INVALID_BODY' },
         { status: 400 }
       )
     }
@@ -129,6 +143,21 @@ export const POST = async (req: Request, { params }: Params) => {
         { status: 500 }
       )
     }
+
+    const summary = typeof evidenceSummary === 'string' && evidenceSummary.trim()
+      ? evidenceSummary.trim()
+      : reason.trim()
+    const sourceUrl = typeof evidenceUrl === 'string' && evidenceUrl.trim()
+      ? evidenceUrl.trim()
+      : null
+
+    await t(db, 'dispute_evidence')
+      .insert({
+        dispute_id: dispute!.id,
+        submitted_by: user.id,
+        summary,
+        source_url: sourceUrl,
+      })
 
     return NextResponse.json({ success: true, dispute: { id: dispute!.id } })
   } catch {

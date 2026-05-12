@@ -36,6 +36,13 @@ set -a
 . "$ENV_FILE"
 set +a
 
+if [ -n "${SUPABASE_DB_URL:-}" ]; then
+  echo "Applying CivicSignal database migrations"
+  for migration in packages/db/migrations/*.sql; do
+    psql "$SUPABASE_DB_URL" -f "$migration"
+  done
+fi
+
 corepack pnpm --filter @civicsignal/web build
 
 docker compose build web resolver

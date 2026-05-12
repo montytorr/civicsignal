@@ -9,6 +9,7 @@ const LABELS: Record<string, string> = {
   methodology: 'Methodology',
   roadmap: 'Roadmap',
   leaderboard: 'Leaderboard',
+  panels: 'Trusted panels',
   verify: 'Public audit',
   admin: 'Admin',
   invites: 'Invites',

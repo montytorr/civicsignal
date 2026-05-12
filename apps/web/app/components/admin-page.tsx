@@ -32,7 +32,9 @@ type Dispute = {
   status: string
   created_at: string
   resolved_at: string | null
-  polls: { question: string } | null
+  polls: { question: string; topics?: { label: string } | null } | null
+  evidence?: Array<{ id: string; summary: string; source_url: string | null; created_at: string }>
+  reviews?: Array<{ id: string; decision: string; rationale: string; created_at: string; profiles?: { handle: string } | null }>
 }
 
 const REGIONS = [
@@ -161,11 +163,12 @@ export const AdminPage = ({
   const [notice, setNotice] = useState<string | null>(null)
   const [disputeList, setDisputeList] = useState<Dispute[]>(disputes)
   const [disputeLoading, setDisputeLoading] = useState<string | null>(null)
+  const [reviewNotes, setReviewNotes] = useState<Record<string, string>>({})
   const [awaitingResolution, setAwaitingResolution] = useState<AwaitingPoll[]>(initialAwaitingResolution)
   const [resolveStates, setResolveStates] = useState<Record<string, ResolveState>>({})
   const [expandedResolve, setExpandedResolve] = useState<string | null>(null)
 
-  const handleDisputeAction = async (disputeId: string, status: 'reviewing' | 'upheld' | 'dismissed') => {
+  const handleDisputeAction = async (disputeId: string, status: 'reviewing') => {
     setDisputeLoading(disputeId)
     try {
       const res = await fetch(`/api/admin/disputes/${disputeId}`, {
@@ -177,6 +180,33 @@ export const AdminPage = ({
       if (res.ok && data.success) {
         setDisputeList((prev) =>
           prev.map((d) => (d.id === disputeId ? { ...d, status: data.dispute.status } : d))
+        )
+      }
+    } finally {
+      setDisputeLoading(null)
+    }
+  }
+
+  const handlePanelReview = async (disputeId: string, decision: 'uphold' | 'dismiss') => {
+    const rationale = reviewNotes[disputeId]?.trim() || (decision === 'uphold' ? 'Panel review supports the dispute.' : 'Panel review does not support the dispute.')
+    setDisputeLoading(disputeId)
+    try {
+      const res = await fetch(`/api/admin/disputes/${disputeId}/reviews`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ decision, rationale }),
+      })
+      const data = await res.json()
+      if (res.ok && data.success) {
+        setDisputeList((prev) =>
+          prev.map((d) => {
+            if (d.id !== disputeId) return d
+            const nextReviews = [
+              ...(d.reviews ?? []).filter((r) => r.id !== data.review.id),
+              data.review,
+            ]
+            return { ...d, status: data.closedAs ?? 'reviewing', reviews: nextReviews }
+          })
         )
       }
     } finally {
@@ -710,6 +740,34 @@ export const AdminPage = ({
                     <p style={{ margin: '0 0 8px', fontSize: 12, color: 'var(--color-parchment-ink-soft)', lineHeight: 1.5 }}>
                       {dispute.reason}
                     </p>
+                    {(dispute.evidence?.length ?? 0) > 0 && (
+                      <div style={{ marginBottom: 8, padding: '8px 10px', border: '1px solid var(--color-parchment-line-soft)', borderRadius: 3 }}>
+                        <div className="font-mono" style={{ fontSize: 10.5, color: 'var(--color-parchment-muted)', letterSpacing: '0.05em', textTransform: 'uppercase' }}>Evidence packet</div>
+                        {dispute.evidence!.map((e) => (
+                          <p key={e.id} style={{ margin: '5px 0 0', fontSize: 11.5, color: 'var(--color-parchment-ink-soft)', lineHeight: 1.45 }}>
+                            {e.source_url ? <a href={e.source_url} target="_blank" rel="noreferrer" style={{ color: 'var(--color-parchment-accent)' }}>Source</a> : 'Source'} · {e.summary}
+                          </p>
+                        ))}
+                      </div>
+                    )}
+                    {(dispute.reviews?.length ?? 0) > 0 && (
+                      <div style={{ marginBottom: 8, fontSize: 11.5, color: 'var(--color-parchment-muted)', lineHeight: 1.45 }}>
+                        {dispute.reviews!.length} panel review{dispute.reviews!.length !== 1 ? 's' : ''}: {dispute.reviews!.map((r) => `${r.profiles?.handle ?? 'reviewer'} ${r.decision}`).join(' · ')}
+                      </div>
+                    )}
+                    {(dispute.status === 'open' || dispute.status === 'reviewing') && (
+                      <textarea
+                        value={reviewNotes[dispute.id] ?? ''}
+                        onChange={(e) => setReviewNotes((prev) => ({ ...prev, [dispute.id]: e.target.value }))}
+                        placeholder="Panel review rationale…"
+                        style={{
+                          width: '100%', minHeight: 48, marginBottom: 8, padding: '7px 9px',
+                          fontSize: 11.5, fontFamily: 'inherit', color: 'var(--color-parchment-ink)',
+                          background: 'var(--color-parchment-bg)', border: '1px solid var(--color-parchment-line)', borderRadius: 3,
+                          resize: 'vertical', outline: 'none', boxSizing: 'border-box',
+                        }}
+                      />
+                    )}
                     <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                       <span className="font-mono" style={{
                         fontSize: 10.5,
@@ -740,7 +798,7 @@ export const AdminPage = ({
                             </button>
                           )}
                           <button
-                            onClick={() => handleDisputeAction(dispute.id, 'upheld')}
+                            onClick={() => handlePanelReview(dispute.id, 'uphold')}
                             disabled={disputeLoading === dispute.id}
                             style={{
                               padding: '4px 10px', fontSize: 11,
@@ -755,7 +813,7 @@ export const AdminPage = ({
                             Uphold
                           </button>
                           <button
-                            onClick={() => handleDisputeAction(dispute.id, 'dismissed')}
+                            onClick={() => handlePanelReview(dispute.id, 'dismiss')}
                             disabled={disputeLoading === dispute.id}
                             style={{
                               padding: '4px 10px', fontSize: 11,
