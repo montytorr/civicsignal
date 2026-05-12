@@ -1,10 +1,10 @@
-# Civic Polling Network
+# CivicSignal
 
-Status: active pre-launch
-Owner: CivicSignal maintainers
-Created: 2026-05-03
-Category: civic-tech
-Repository: https://github.com/montytorr/civicsignal
+Open-source verified-human civic polling for auditable public opinion signals.
+
+**Live:** https://civicsignal.montytorr.tech  
+**Status:** active pre-launch  
+**Category:** civic-tech
 
 ## Goal
 

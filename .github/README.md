@@ -1,3 +1,3 @@
-# GitHub Metadata
+# CivicSignal GitHub configuration
 
-This directory is reserved for issue templates, pull request templates, workflows, and repository governance docs as CivicSignal moves from planning into implementation.
+This directory contains issue templates, pull request templates, workflows, and repository governance docs for CivicSignal.
