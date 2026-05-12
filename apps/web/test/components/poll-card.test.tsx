@@ -37,9 +37,9 @@ describe('PollCard', () => {
     expect(screen.getByText('EU')).toBeInTheDocument()
   })
 
-  it('renders the participant count', () => {
+  it('renders the sealed answer count', () => {
     render(<PollCard poll={makeActivePoll({ participants: 4200 })} />)
-    expect(screen.getByText(/4,200 verified humans/i)).toBeInTheDocument()
+    expect(screen.getByText(/4,200 sealed answers/i)).toBeInTheDocument()
   })
 
   it('renders the options count', () => {
