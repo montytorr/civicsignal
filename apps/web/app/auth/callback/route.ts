@@ -5,6 +5,7 @@ import { createServiceClient } from '@/lib/supabase-server'
 export const GET = async (request: NextRequest) => {
   const { searchParams, origin } = new URL(request.url)
   const code = searchParams.get('code')
+  const next = searchParams.get('next') ?? '/onboarding'
 
   if (code) {
     const supabase = await createClient()
@@ -32,7 +33,7 @@ export const GET = async (request: NextRequest) => {
           )
       }
 
-      return NextResponse.redirect(`${origin}/polls`)
+      return NextResponse.redirect(`${origin}${next.startsWith('/') ? next : '/onboarding'}`)
     }
   }
 

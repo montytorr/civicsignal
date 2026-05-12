@@ -20,6 +20,7 @@
     "next": "^16",
     "react": "^19",
     "react-dom": "^19",
+    "resend": "^6.12.3",
     "tweetnacl": "^1"
   },
   "devDependencies": {

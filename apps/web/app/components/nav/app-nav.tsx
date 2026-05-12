@@ -69,7 +69,7 @@ export const AppNav = () => {
 
   const tabs = [
     ...BASE_TABS,
-    ...(user ? [{ label: 'Reputation', href: handle ? `/u/${handle}` : '/u' }] : []),
+    ...(user ? [{ label: 'Start', href: '/onboarding' }, { label: 'Reputation', href: handle ? `/u/${handle}` : '/u' }] : []),
     ...(isAdmin ? [{ label: 'Admin', href: '/admin' }] : []),
   ]
 

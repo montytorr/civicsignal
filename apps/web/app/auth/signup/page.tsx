@@ -2,8 +2,6 @@
 
 import { useState } from 'react'
 import Link from 'next/link'
-import { createClient } from '@/lib/supabase-browser'
-import { generateHandle } from '@/lib/handle-generator'
 
 const inputStyle: React.CSSProperties = {
   width: '100%',
@@ -50,25 +48,24 @@ export default function SignUpPage() {
 
     setLoading(true)
 
-    const supabase = createClient()
-    const handle = generateHandle()
-
-    const { error: authError } = await supabase.auth.signUp({
-      email,
-      password,
-      options: {
-        data: { handle },
-      },
-    })
-
-    if (authError) {
-      setError(authError.message)
+    try {
+      const res = await fetch('/api/auth/signup', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email, password }),
+      })
+      const data = await res.json()
+      if (!res.ok || !data.success) {
+        setError(data.error ?? 'Could not create account')
+        setLoading(false)
+        return
+      }
+      setSuccess(true)
+    } catch {
+      setError('Network error — please try again')
+    } finally {
       setLoading(false)
-      return
     }
-
-    setSuccess(true)
-    setLoading(false)
   }
 
   return (
@@ -96,7 +93,7 @@ export default function SignUpPage() {
             Create account
           </h1>
           <p style={{ margin: '0 0 28px', fontSize: 13.5, color: '#6B7488' }}>
-            Join CivicSignal — your handle is generated for you.
+            Join CivicSignal — confirm by email, then start voting or proposing civic questions.
           </p>
 
           {success ? (
@@ -112,7 +109,7 @@ export default function SignUpPage() {
               }}
             >
               <strong style={{ display: 'block', marginBottom: 6 }}>Almost there.</strong>
-              Check your email to confirm your account, then sign in.
+              Check your email for a CivicSignal confirmation link. After confirming, we’ll take you straight into onboarding.
             </div>
           ) : (
             <form onSubmit={handleSubmit}>
@@ -194,7 +191,7 @@ export default function SignUpPage() {
                   transition: 'background 0.15s',
                 }}
               >
-                {loading ? 'Creating account…' : 'Create account'}
+                {loading ? 'Sending confirmation…' : 'Create account'}
               </button>
             </form>
           )}

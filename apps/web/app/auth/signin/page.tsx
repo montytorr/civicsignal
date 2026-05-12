@@ -47,7 +47,7 @@ export default function SignInPage() {
       return
     }
 
-    router.push('/polls')
+    router.push('/onboarding')
     router.refresh()
   }
 
@@ -76,7 +76,7 @@ export default function SignInPage() {
             Sign in
           </h1>
           <p style={{ margin: '0 0 28px', fontSize: 13.5, color: '#6B7488' }}>
-            Welcome back to CivicSignal.
+            Welcome back. We’ll take you to your next useful action.
           </p>
 
           <form onSubmit={handleSubmit}>
