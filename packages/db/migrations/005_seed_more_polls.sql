@@ -357,4 +357,5 @@ from (
   cutoff_at,
   resolves_at
 )
-join topic_ids t on t.slug = p.topic_slug;
+join topic_ids t on t.slug = p.topic_slug
+where not exists (select 1 from public.polls existing where existing.question = p.question);
