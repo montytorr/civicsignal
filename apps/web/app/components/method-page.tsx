@@ -39,20 +39,32 @@ const SECTIONS = [
     ],
   },
   {
-    id: 'resolve',
+    id: 'authoring',
     n: '04',
+    h: 'Community poll authoring',
+    d: 'Verified users can propose civic polls with a question, topic, region, outcome options, cutoff, source-of-truth, and resolution criteria. Proposals enter a moderation queue instead of going straight live, so poll quality improves without hiding the curation layer.',
+    bullets: [
+      'Verified-user proposals',
+      'Public proposal log',
+      'Reusable source templates',
+      'Admin or panel moderation',
+    ],
+  },
+  {
+    id: 'resolve',
+    n: '05',
     h: 'Resolution',
-    d: 'Every poll names a single source-of-truth before it opens. After cutoff, a resolver records the outcome with linked evidence, a timestamp, and the named source — then a 24h dispute window opens.',
+    d: 'Every poll names a single source-of-truth before it opens, often from a region-specific template. After cutoff, a resolver records the outcome with linked evidence, a timestamp, and the named source — then a 24h dispute window opens.',
     bullets: [
       'Source named pre-launch',
       'Linked, timestamped evidence',
       '24h public dispute window',
-      'Multi-resolver review on disputes',
+      'Trusted-panel review on disputes',
     ],
   },
   {
     id: 'rep',
-    n: '05',
+    n: '06',
     h: 'Reputation',
     d: "Reputation is topic-specific and earned by being on the correct side of a resolved poll. It can’t be transferred, sold, staked, or boosted by paying. There is no single global score.",
     bullets: [
@@ -63,8 +75,20 @@ const SECTIONS = [
     ],
   },
   {
+    id: 'panels',
+    n: '07',
+    h: 'Trusted panels',
+    d: 'High-reputation users can be invited into topic panels. Panels review disputes, assess evidence, and help turn edge cases into auditable decisions without making CivicSignal dependent on a single resolver.',
+    bullets: [
+      'Topic-specific panel seats',
+      'Dispute evidence review',
+      'Moderator notes preserved',
+      'Panel workspace for review',
+    ],
+  },
+  {
     id: 'audit',
-    n: '06',
+    n: '08',
     h: 'Open audit',
     d: 'All commitments, resolutions, and reputation events are mirrored to a public log. The auditor CLI re-runs the entire history end-to-end against the log and prints a single fingerprint.',
     bullets: [
@@ -93,7 +117,7 @@ export const MethodPage = () => (
         }}
       >
       <div>
-        <Eyebrow>Methodology · v0.4</Eyebrow>
+        <Eyebrow>Methodology · v0.8</Eyebrow>
         <h1
           style={{
             margin: '14px 0 0',
@@ -120,7 +144,7 @@ export const MethodPage = () => (
       >
         Trust is not a feeling we ask you for — it is the property of a system you can audit.
         This page describes how every part of CivicSignal is built so that no single party,
-        including us, can tilt an outcome without leaving evidence behind.
+        including us, can tilt an outcome, curate questions, or resolve disputes without leaving evidence behind.
       </p>
       </div>
     </section>
@@ -238,14 +262,14 @@ export const MethodPage = () => (
             textWrap: 'balance' as never,
           }}
         >
-          Read the source. Run the auditor. Open an issue.
+          Read the source. Propose a poll. Run the auditor.
         </h2>
         <div style={{ display: 'flex', gap: 12, justifyContent: 'flex-end' }}>
           <Link href="https://github.com/montytorr/civicsignal" target="_blank" rel="noopener noreferrer">
             <Btn kind="ghost" size="md">Auditor CLI →</Btn>
           </Link>
-          <Link href="/methodology/spec">
-            <Btn kind="primary" size="md">Read the spec →</Btn>
+          <Link href="/proposals">
+            <Btn kind="primary" size="md">Propose a poll →</Btn>
           </Link>
         </div>
       </div>

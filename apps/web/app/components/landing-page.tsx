@@ -166,8 +166,7 @@ export const LandingPage = ({ polls, stats }: { polls: Poll[]; stats: Stats }) =
             textWrap: 'pretty' as never,
           }}
         >
-          CivicSignal lets pseudonymous, verified people answer real-world civic questions —
-          and earn non-transferable reputation when their judgment proves right.
+          CivicSignal lets pseudonymous, verified people propose, vote on, dispute, and resolve real-world civic questions — with public evidence trails and non-transferable topic reputation.
         </p>
 
         {/* CTAs */}
@@ -175,8 +174,8 @@ export const LandingPage = ({ polls, stats }: { polls: Poll[]; stats: Stats }) =
           <Link href="/polls">
             <Btn kind="primary" size="lg">Explore active polls</Btn>
           </Link>
-          <Link href="/auth/signup">
-            <Btn kind="ghost" size="lg">Join the beta</Btn>
+          <Link href="/proposals">
+            <Btn kind="ghost" size="lg">Propose a poll</Btn>
           </Link>
         </div>
 
@@ -243,12 +242,12 @@ export const LandingPage = ({ polls, stats }: { polls: Poll[]; stats: Stats }) =
         style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline', marginBottom: 48 }}
       >
         <Eyebrow>How it works</Eyebrow>
-        <span className="font-mono" style={{ fontSize: 11, color: '#6B7488' }}>01 / 04</span>
+        <span className="font-mono" style={{ fontSize: 11, color: '#6B7488' }}>01 / 05</span>
       </div>
       <div
         style={{
           display: 'grid',
-          gridTemplateColumns: 'repeat(3, 1fr)',
+          gridTemplateColumns: 'repeat(4, 1fr)',
           gap: 0,
           borderTop: '1px solid #D9D1BD',
         }}
@@ -266,15 +265,20 @@ export const LandingPage = ({ polls, stats }: { polls: Poll[]; stats: Stats }) =
           },
           {
             n: '03',
-            h: 'Reputation that has to be earned.',
-            d: 'You only gain topic-specific reputation when a poll resolves and your answer was correct. It cannot be transferred, sold, staked, or boosted.',
+            h: 'Questions proposed in public.',
+            d: 'Verified users can propose polls with source-of-truth, region, options, and resolution criteria. Moderation decisions stay visible instead of disappearing into a black box.',
+          },
+          {
+            n: '04',
+            h: 'Panels for hard cases.',
+            d: 'Trusted topic panelists review dispute evidence and resolution edge cases, preserving notes and decisions in the audit trail.',
           },
         ].map((pl, i) => (
           <div
             key={pl.n}
             style={{
               padding: i === 0 ? '36px 32px 36px 0' : '36px 32px 36px 32px',
-              borderRight: i < 2 ? '1px solid #D9D1BD' : 'none',
+              borderRight: i < 3 ? '1px solid #D9D1BD' : 'none',
               position: 'relative',
             }}
           >
@@ -358,12 +362,10 @@ export const LandingPage = ({ polls, stats }: { polls: Poll[]; stats: Stats }) =
             textWrap: 'balance' as never,
           }}
         >
-          Every poll is verifiable. Every resolution is auditable.
+          Every proposal, poll, dispute, and resolution is auditable.
         </h2>
         <p style={{ margin: 0, fontSize: 14.5, lineHeight: 1.6, color: '#3A4861', maxWidth: 380 }}>
-          Resolution sources are committed before the cutoff, votes are hashed and published as a
-          public commitment, and the resolution itself is announced with evidence. Anyone can
-          re-run the audit.
+          Polls begin as public proposals or admin drafts, use named resolution sources before cutoff, seal votes until tally, and publish resolution evidence plus dispute review. Anyone can re-run the audit trail.
         </p>
         <Link href="/methodology">
           <Btn kind="ghost" size="md" style={{ marginTop: 22 }}>
@@ -372,16 +374,14 @@ export const LandingPage = ({ polls, stats }: { polls: Poll[]; stats: Stats }) =
         </Link>
       </div>
       <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: 12 }}>
-        <MethodCallout label="Source-of-truth">
-          Each poll names its single, named source-of-truth before opening — usually an official
-          body or named publication.
+        <MethodCallout label="Community proposals">
+          Verified users can propose polls with a topic, region, options, source-of-truth, and resolution criteria.
         </MethodCallout>
-        <MethodCallout label="Public commitment">
-          A hash of all sealed votes is published before cutoff. Anyone can verify no votes were
-          added or changed.
+        <MethodCallout label="Source templates">
+          Region-specific templates keep official sources and resolution criteria consistent across jurisdictions.
         </MethodCallout>
-        <MethodCallout label="Resolution evidence">
-          Resolutions are posted with linked evidence, a timestamp, and a 24h dispute window.
+        <MethodCallout label="Disputes + panels">
+          Resolutions include evidence, a dispute window, and trusted-panel review for hard edge cases.
         </MethodCallout>
         <MethodCallout label="Open audit">
           All commitments and resolutions are mirrored to a public log. Re-running the audit is a
@@ -426,7 +426,7 @@ export const LandingPage = ({ polls, stats }: { polls: Poll[]; stats: Stats }) =
           </h2>
         </div>
         <span className="font-mono" style={{ fontSize: 11, color: '#6B7488' }}>
-          v0.4 → v1.0
+          v0.8 → v1.0
         </span>
       </div>
       <div
@@ -442,26 +442,26 @@ export const LandingPage = ({ polls, stats }: { polls: Poll[]; stats: Stats }) =
           {
             date: '2026 · Q2',
             state: 'now',
-            h: 'Verified-human polling',
-            d: 'Pseudonymous voting, sealed until cutoff, single-source resolution, topic reputation.',
+            h: 'Verified-human civic loop',
+            d: 'Pseudonymous voting, community proposals, sealed votes, trusted panels, disputes, source templates, and topic reputation.',
           },
           {
             date: '2026 · Q4',
             state: 'next',
-            h: 'Citizen evidence panels',
-            d: 'Reputation-weighted invitation to submit evidence on resolution edge cases.',
+            h: 'Public proposal governance',
+            d: 'Broader review workflows for community-authored polls, source curation, and proposal appeals.',
           },
           {
             date: '2027 · H1',
             state: 'next',
-            h: 'Cross-jurisdiction polls',
-            d: 'Region-aware question authoring with locale-specific resolution sources.',
+            h: 'Cross-jurisdiction expansion',
+            d: 'More locale-specific templates, multilingual question framing, and regional panel capacity.',
           },
           {
             date: '2027 · H2',
             state: 'soon',
             h: 'Public-good civic governance',
-            d: 'Reputation-gated governance for poll authoring, dispute review, and source curation.',
+            d: 'Reputation-gated governance over authoring rules, dispute review policy, and source curation.',
           },
         ].map((m, i) => (
           <div
