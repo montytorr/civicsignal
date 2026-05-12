@@ -294,3 +294,79 @@ export const getAuditCommitments = async () => {
     polls: { question: string } | null
   }>
 }
+
+export const getPanelInviteCandidates = async () => {
+  const supabase = await createClient()
+  const { data } = await (supabase as any)
+    .from('user_topic_reputation')
+    .select('user_id, topic_id, score, resolved_count, correct_count, profiles(handle, verified), topics(slug, label)')
+    .gt('score', 0)
+    .order('score', { ascending: false })
+    .limit(100)
+    .then((r: any) => r)
+    .catch(() => ({ data: [] }))
+
+  const rows = data ?? []
+  const userIds = Array.from(new Set(rows.map((r: any) => r.user_id).filter(Boolean)))
+  const topicIds = Array.from(new Set(rows.map((r: any) => r.topic_id).filter(Boolean)))
+
+  const { data: memberships } = userIds.length && topicIds.length
+    ? await (supabase as any)
+      .from('panel_members')
+      .select('user_id, topic_id, status')
+      .in('user_id', userIds)
+      .in('topic_id', topicIds)
+      .then((r: any) => r)
+      .catch(() => ({ data: [] }))
+    : { data: [] }
+
+  return rows.map((row: any) => ({
+    ...row,
+    panelStatus: (memberships ?? []).find((m: any) => m.user_id === row.user_id && m.topic_id === row.topic_id)?.status ?? null,
+  }))
+}
+
+export const getMyPanelWorkspace = async () => {
+  const supabase = await createClient()
+  const { data: { user } } = await supabase.auth.getUser()
+  if (!user) return { user: null, memberships: [], disputes: [] }
+
+  const { data: memberships } = await (supabase as any)
+    .from('panel_members')
+    .select('*, topics(label, slug)')
+    .eq('user_id', user.id)
+    .eq('status', 'active')
+    .order('accepted_at', { ascending: false })
+    .then((r: any) => r)
+    .catch(() => ({ data: [] }))
+
+  const topicIds = (memberships ?? []).map((m: any) => m.topic_id)
+  if (topicIds.length === 0) return { user, memberships: memberships ?? [], disputes: [] }
+
+  const { data: disputes } = await (supabase as any)
+    .from('disputes')
+    .select('*, polls(question, topic_id, topics(label))')
+    .in('status', ['open', 'reviewing'])
+    .in('polls.topic_id', topicIds)
+    .order('created_at', { ascending: false })
+    .then((r: any) => r)
+    .catch(() => ({ data: [] }))
+
+  const ids = (disputes ?? []).map((d: any) => d.id)
+  if (ids.length === 0) return { user, memberships: memberships ?? [], disputes: [] }
+
+  const [evidenceRes, reviewRes] = await Promise.all([
+    (supabase as any).from('dispute_evidence').select('*').in('dispute_id', ids).order('created_at').then((r: any) => r).catch(() => ({ data: [] })),
+    (supabase as any).from('dispute_reviews').select('*, profiles(handle)').in('dispute_id', ids).order('created_at').then((r: any) => r).catch(() => ({ data: [] })),
+  ])
+
+  return {
+    user,
+    memberships: memberships ?? [],
+    disputes: (disputes ?? []).map((d: any) => ({
+      ...d,
+      evidence: (evidenceRes.data ?? []).filter((e: any) => e.dispute_id === d.id),
+      reviews: (reviewRes.data ?? []).filter((r: any) => r.dispute_id === d.id),
+    })),
+  }
+}

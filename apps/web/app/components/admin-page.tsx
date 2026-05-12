@@ -37,6 +37,17 @@ type Dispute = {
   reviews?: Array<{ id: string; decision: string; rationale: string; created_at: string; profiles?: { handle: string } | null }>
 }
 
+type PanelCandidate = {
+  user_id: string
+  topic_id: string
+  score: number
+  resolved_count: number
+  correct_count: number
+  panelStatus: string | null
+  profiles: { handle: string; verified: boolean } | null
+  topics: { slug: string; label: string } | null
+}
+
 const REGIONS = [
   'Global', 'United States', 'European Union', 'United Nations', 'OPEC+',
 ]
@@ -141,11 +152,13 @@ export const AdminPage = ({
   disputes,
   awaitingResolution: initialAwaitingResolution,
   auditStats,
+  panelCandidates,
 }: {
   topics: Topic[]
   disputes: Dispute[]
   awaitingResolution: AwaitingPoll[]
   auditStats: AuditStats
+  panelCandidates: PanelCandidate[]
 }) => {
   const [question, setQuestion] = useState('Will the IPCC AR7 Synthesis Report be published before 31 December 2026?')
   const [topicId, setTopicId] = useState(topics[0]?.id ?? '')
@@ -164,6 +177,9 @@ export const AdminPage = ({
   const [disputeList, setDisputeList] = useState<Dispute[]>(disputes)
   const [disputeLoading, setDisputeLoading] = useState<string | null>(null)
   const [reviewNotes, setReviewNotes] = useState<Record<string, string>>({})
+  const [candidateKey, setCandidateKey] = useState(panelCandidates.find((c) => !c.panelStatus)?.user_id + ':' + panelCandidates.find((c) => !c.panelStatus)?.topic_id || '')
+  const [inviteMinRep, setInviteMinRep] = useState('1')
+  const [invitingPanelist, setInvitingPanelist] = useState(false)
   const [awaitingResolution, setAwaitingResolution] = useState<AwaitingPoll[]>(initialAwaitingResolution)
   const [resolveStates, setResolveStates] = useState<Record<string, ResolveState>>({})
   const [expandedResolve, setExpandedResolve] = useState<string | null>(null)
@@ -348,6 +364,35 @@ export const AdminPage = ({
       setError('Network error — please try again')
     } finally {
       setPublishing(false)
+    }
+  }
+
+  const handlePanelInvite = async () => {
+    const [userId, topicId] = candidateKey.split(':')
+    if (!userId || !topicId) {
+      setError('Select an eligible user before inviting a panelist.')
+      return
+    }
+    setInvitingPanelist(true)
+    setError(null)
+    setNotice(null)
+    try {
+      const res = await fetch('/api/admin/panels/invite', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ userId, topicId, minReputation: Number(inviteMinRep) || 1, activate: true }),
+      })
+      const data = await res.json()
+      if (!res.ok || !data.success) {
+        setError(data.error ?? 'Failed to invite panelist')
+        return
+      }
+      const candidate = panelCandidates.find((c) => c.user_id === userId && c.topic_id === topicId)
+      setNotice(`Panelist activated · ${candidate?.profiles?.handle ?? userId} / ${candidate?.topics?.label ?? 'topic'}`)
+    } catch {
+      setError('Network error — please try again')
+    } finally {
+      setInvitingPanelist(false)
     }
   }
 
@@ -701,6 +746,45 @@ export const AdminPage = ({
                     </div>
                   )
                 })
+              )}
+            </div>
+
+            {/* Panel invitations */}
+            <div style={{
+              background: 'var(--color-parchment-surface)',
+              border: '1px solid var(--color-parchment-line)',
+              borderRadius: 4, padding: '18px 20px',
+            }}>
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline' }}>
+                <Eyebrow>Panel invitations</Eyebrow>
+                <span className="font-mono" style={{ fontSize: 11, color: 'var(--color-parchment-muted)' }}>rep-gated</span>
+              </div>
+              <p style={{ margin: '8px 0 12px', fontSize: 12, color: 'var(--color-parchment-muted)', lineHeight: 1.5 }}>
+                Promote users with topic reputation into active review panels. Active panelists can review disputes in their topic workspace.
+              </p>
+              {panelCandidates.length === 0 ? (
+                <p style={{ margin: 0, fontSize: 12.5, color: 'var(--color-parchment-muted)' }}>No eligible users with topic reputation yet.</p>
+              ) : (
+                <>
+                  <Field label="Eligible user / topic" mt={0}>
+                    <SelectField
+                      value={candidateKey}
+                      options={panelCandidates.map((c) => ({
+                        value: `${c.user_id}:${c.topic_id}`,
+                        label: `${c.profiles?.handle ?? c.user_id.slice(0, 8)} · ${c.topics?.label ?? 'Topic'} · ${c.score} rep${c.panelStatus ? ` · ${c.panelStatus}` : ''}`,
+                      }))}
+                      onChange={setCandidateKey}
+                    />
+                  </Field>
+                  <Field label="Minimum reputation threshold">
+                    <input value={inviteMinRep} onChange={(e) => setInviteMinRep(e.target.value)} className="font-mono" style={inputStyle} />
+                  </Field>
+                  <div style={{ marginTop: 12 }}>
+                    <Btn kind="primary" size="md" onClick={handlePanelInvite} disabled={invitingPanelist || !candidateKey}>
+                      {invitingPanelist ? 'Activating…' : 'Activate panelist'}
+                    </Btn>
+                  </div>
+                </>
               )}
             </div>
 

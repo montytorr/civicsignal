@@ -1,7 +1,7 @@
 import type { Metadata } from 'next'
 import { redirect } from 'next/navigation'
 import { createClient, createServiceClient } from '@/lib/supabase-server'
-import { getTopics, getOpenDisputes, getAwaitingResolution, getAuditStats } from '@/lib/queries'
+import { getTopics, getOpenDisputes, getAwaitingResolution, getAuditStats, getPanelInviteCandidates } from '@/lib/queries'
 import { AdminPage } from '@/components/admin-page'
 
 export const metadata: Metadata = {
@@ -26,11 +26,12 @@ export default async function Page() {
     redirect('/polls')
   }
 
-  const [topics, disputes, awaitingResolution, auditStats] = await Promise.all([
+  const [topics, disputes, awaitingResolution, auditStats, panelCandidates] = await Promise.all([
     getTopics(),
     getOpenDisputes(),
     getAwaitingResolution(),
     getAuditStats(),
+    getPanelInviteCandidates(),
   ])
 
   return (
@@ -39,6 +40,7 @@ export default async function Page() {
       disputes={disputes}
       awaitingResolution={awaitingResolution}
       auditStats={auditStats}
+      panelCandidates={panelCandidates}
     />
   )
 }

@@ -1,6 +1,6 @@
 import type { Metadata } from 'next'
 import Link from 'next/link'
-import { Eyebrow, Badge } from '@civicsignal/ui'
+import { Eyebrow, Badge, Btn } from '@civicsignal/ui'
 import { getPanelTransparency } from '@/lib/queries'
 
 export const metadata: Metadata = {
@@ -25,9 +25,14 @@ export default async function Page() {
               Evidence and review should leave fingerprints.
             </h1>
           </div>
-          <p style={{ margin: 0, fontSize: 15.5, lineHeight: 1.6, color: 'var(--color-parchment-ink-soft)', maxWidth: 560 }}>
-            Panel membership is reputation-gated by topic. When a resolution is disputed, evidence packets and panel reviews are published here so the review process is inspectable instead of hidden in an admin box.
-          </p>
+          <div>
+            <p style={{ margin: 0, fontSize: 15.5, lineHeight: 1.6, color: 'var(--color-parchment-ink-soft)', maxWidth: 560 }}>
+              Panel membership is reputation-gated by topic. When a resolution is disputed, evidence packets and panel reviews are published here so the review process is inspectable instead of hidden in an admin box.
+            </p>
+            <div style={{ marginTop: 16 }}>
+              <Link href="/panels/me"><Btn kind="primary" size="md">Open panel workspace →</Btn></Link>
+            </div>
+          </div>
         </section>
 
         <section className="cs-responsive-grid" style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 12, marginTop: 28 }}>

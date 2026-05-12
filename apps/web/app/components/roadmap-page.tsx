@@ -22,17 +22,17 @@ const PHASES = [
   },
   {
     id: 'panels',
-    date: '2026 · Q4',
-    state: 'next' as const,
+    date: '2026 · Q3',
+    state: 'now' as const,
     title: 'Trusted panels',
     subtitle: 'Reputation-weighted evidence and review.',
     description:
       'High-reputation users become eligible for topic-specific panels. Panel members can submit evidence on resolution edge cases and participate in dispute review.',
     milestones: [
-      { label: 'Reputation-gated panel invitations', done: false },
-      { label: 'Evidence submission workflow', done: false },
-      { label: 'Multi-resolver dispute review', done: false },
-      { label: 'Panel transparency reports', done: false },
+      { label: 'Reputation-gated panel invitations', done: true },
+      { label: 'Evidence submission workflow', done: true },
+      { label: 'Multi-resolver dispute review', done: true },
+      { label: 'Panel transparency reports', done: true },
     ],
   },
   {
@@ -106,7 +106,7 @@ export const RoadmapPage = () => (
         }}
       >
         <div>
-          <Eyebrow>Democracy roadmap · v0.5</Eyebrow>
+          <Eyebrow>Democracy roadmap · v0.6</Eyebrow>
           <h1
             style={{
               margin: '14px 0 0',
