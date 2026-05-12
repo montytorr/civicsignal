@@ -1,5 +1,7 @@
 # CivicSignal
 
+![CivicSignal social preview](docs/assets/civicsignal-social-preview.png)
+
 Open-source verified-human civic polling for auditable public opinion signals.
 
 **Live:** https://civicsignal.montytorr.tech  
@@ -22,6 +24,16 @@ CivicSignal is preparing for an open-source launch. The public posture is:
 - **Contributor-friendly** — product decisions, poll standards, and trust-model changes should be documented in the same pull request as implementation.
 
 Before opening the repository broadly, keep these files current: `README.md`, `CONTRIBUTING.md`, `docs/`, `.github/ISSUE_TEMPLATE/`, and `.github/pull_request_template.md`.
+
+## Product preview
+
+| Guided demo | Public audit console |
+| --- | --- |
+| ![CivicSignal guided demo](docs/assets/screenshots/demo.png) | ![CivicSignal audit console](docs/assets/screenshots/verify.png) |
+
+| Proposal workflow | Active polls |
+| --- | --- |
+| ![CivicSignal proposal workflow](docs/assets/screenshots/proposals.png) | ![CivicSignal active polls](docs/assets/screenshots/polls.png) |
 
 ## Quickstart
 

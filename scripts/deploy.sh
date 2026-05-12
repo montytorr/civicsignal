@@ -38,8 +38,38 @@ set +a
 
 if [ -n "${SUPABASE_DB_URL:-}" ]; then
   echo "Applying CivicSignal database migrations"
+  psql "$SUPABASE_DB_URL" -v ON_ERROR_STOP=1 -q <<'SQL'
+CREATE TABLE IF NOT EXISTS schema_migrations (
+  filename text PRIMARY KEY,
+  applied_at timestamptz NOT NULL DEFAULT now()
+);
+SQL
+
+  # Production predates the migration ledger. If the core schema already exists but
+  # the ledger is empty, mark current migrations as applied instead of replaying
+  # years of CREATE POLICY noise on every deploy.
+  ledger_count=$(psql "$SUPABASE_DB_URL" -Atqc "SELECT count(*) FROM schema_migrations")
+  core_schema_exists=$(psql "$SUPABASE_DB_URL" -Atqc "SELECT to_regclass('public.polls') IS NOT NULL")
+  if [ "$ledger_count" = "0" ] && [ "$core_schema_exists" = "t" ]; then
+    echo "Bootstrapping migration ledger from existing production schema"
+    for migration in packages/db/migrations/*.sql; do
+      filename=$(basename "$migration")
+      psql "$SUPABASE_DB_URL" -v ON_ERROR_STOP=1 -q \
+        -c "INSERT INTO schema_migrations(filename) VALUES ('$filename') ON CONFLICT DO NOTHING"
+    done
+  fi
+
   for migration in packages/db/migrations/*.sql; do
-    psql "$SUPABASE_DB_URL" -f "$migration"
+    filename=$(basename "$migration")
+    already_applied=$(psql "$SUPABASE_DB_URL" -Atqc "SELECT EXISTS (SELECT 1 FROM schema_migrations WHERE filename = '$filename')")
+    if [ "$already_applied" = "t" ]; then
+      echo "Skipping migration $filename"
+      continue
+    fi
+    echo "Applying migration $filename"
+    psql "$SUPABASE_DB_URL" -v ON_ERROR_STOP=1 -f "$migration"
+    psql "$SUPABASE_DB_URL" -v ON_ERROR_STOP=1 -q \
+      -c "INSERT INTO schema_migrations(filename) VALUES ('$filename') ON CONFLICT DO NOTHING"
   done
 fi
 

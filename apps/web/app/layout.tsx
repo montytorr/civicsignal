@@ -20,8 +20,22 @@ const ibmPlexMono = IBM_Plex_Mono({
 })
 
 export const metadata: Metadata = {
+  metadataBase: new URL(process.env.NEXT_PUBLIC_APP_URL || 'https://civicsignal.montytorr.tech'),
   title: 'CivicSignal',
-  description: 'Verified-human polling for public intelligence.',
+  description: 'Open-source verified-human civic polling for auditable public opinion signals.',
+  openGraph: {
+    title: 'CivicSignal',
+    description: 'Verified-human civic polling for auditable public opinion signals.',
+    url: '/',
+    siteName: 'CivicSignal',
+    images: [{ url: '/social/preview.png', width: 1280, height: 640, alt: 'CivicSignal — verified-human civic polling' }],
+  },
+  twitter: {
+    card: 'summary_large_image',
+    title: 'CivicSignal',
+    description: 'Verified-human civic polling for auditable public opinion signals.',
+    images: ['/social/preview.png'],
+  },
 }
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
