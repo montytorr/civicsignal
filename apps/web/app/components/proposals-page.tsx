@@ -6,11 +6,11 @@ import { Eyebrow, Badge, Btn } from '@civicsignal/ui'
 
 type Topic = { id: string; slug: string; label: string }
 type Template = { id: string; slug: string; label: string; region: string; source_of_truth: string; resolution_criteria_template: string; topic_slug?: string | null }
-type Proposal = { id: string; question: string; region: string; status: string; created_at: string; moderator_notes?: string | null; poll_id?: string | null; topics?: { label: string } | null; profiles?: { handle: string } | null }
+type Proposal = { id: string; question: string; region: string; status: string; created_at: string; moderator_notes?: string | null; poll_id?: string | null; revision_count?: number | null; appeal_reason?: string | null; appealed_at?: string | null; topics?: { label: string } | null; profiles?: { handle: string } | null }
 
 const inputStyle: React.CSSProperties = { width: '100%', height: 38, padding: '0 12px', fontSize: 13.5, fontFamily: 'inherit', color: 'var(--color-parchment-ink)', background: 'var(--color-parchment-bg)', border: '1px solid var(--color-parchment-line)', borderRadius: 3, outline: 'none', boxSizing: 'border-box' }
 
-const statusTone = (s: string) => s === 'approved' ? 'green' : s === 'pending' ? 'amber' : 'neutral'
+const statusTone = (s: string) => s === 'approved' ? 'green' : ['pending', 'appealed'].includes(s) ? 'amber' : 'neutral'
 
 export const ProposalsPage = ({ topics, templates, proposals, signedIn }: { topics: Topic[]; templates: Template[]; proposals: Proposal[]; signedIn: boolean }) => {
   const [question, setQuestion] = useState('Will the European Commission publish a final AI liability proposal before 30 June 2026?')
@@ -25,6 +25,7 @@ export const ProposalsPage = ({ topics, templates, proposals, signedIn }: { topi
   const [notice, setNotice] = useState<string | null>(null)
   const [error, setError] = useState<string | null>(null)
   const [items, setItems] = useState(proposals)
+  const [actioningProposal, setActioningProposal] = useState<string | null>(null)
 
   const applyTemplate = (slug: string) => {
     const t = templates.find((tpl) => tpl.slug === slug)
@@ -46,6 +47,32 @@ export const ProposalsPage = ({ topics, templates, proposals, signedIn }: { topi
       setItems([{ id: data.proposal.id, question, region, status: 'pending', created_at: new Date().toISOString(), topics: { label: topics.find((t) => t.id === topicId)?.label ?? 'Topic' }, profiles: { handle: 'you' } }, ...items])
     } catch { setError('Network error — please try again') }
     finally { setSubmitting(false) }
+  }
+
+
+  const loadProposalForRevision = (p: Proposal) => {
+    setQuestion(p.question)
+    setRegion(p.region)
+    setOptions(Array.isArray((p as any).options) ? (p as any).options : ['Yes', 'No'])
+    setSourceOfTruth((p as any).source_of_truth ?? sourceOfTruth)
+    setResolutionCriteria((p as any).resolution_criteria ?? resolutionCriteria)
+    setCutoffAt(((p as any).cutoff_at ?? cutoffAt).replace('T', ' ').slice(0, 16))
+    setResolvesAt(((p as any).resolves_at ?? resolvesAt).replace('T', ' ').slice(0, 16))
+    setNotice(`Loaded proposal ${p.id} into the form. Edit it, then submit as a fresh proposal.`)
+  }
+
+  const appealProposal = async (proposalId: string) => {
+    const appealReason = window.prompt('Why should this rejection be reconsidered?')
+    if (!appealReason) return
+    setActioningProposal(proposalId); setNotice(null); setError(null)
+    try {
+      const res = await fetch(`/api/proposals/${proposalId}`, { method: 'PATCH', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ action: 'appeal', appealReason }) })
+      const data = await res.json()
+      if (!res.ok || !data.success) { setError(data.error ?? 'Failed to appeal proposal'); return }
+      setItems((prev) => prev.map((p) => p.id === proposalId ? { ...p, status: 'appealed', appeal_reason: appealReason, appealed_at: new Date().toISOString() } : p))
+      setNotice(`Appeal submitted · ${proposalId}`)
+    } catch { setError('Network error — please try again') }
+    finally { setActioningProposal(null) }
   }
 
   return (
@@ -86,8 +113,14 @@ export const ProposalsPage = ({ topics, templates, proposals, signedIn }: { topi
               <div key={p.id} style={{ padding: '15px 20px', borderBottom: '1px solid var(--color-parchment-line-soft)' }}>
                 <div style={{ display: 'flex', justifyContent: 'space-between', gap: 12 }}><div style={{ fontSize: 13.5, lineHeight: 1.4 }}>{p.question}</div><Badge tone={statusTone(p.status) as any} mono>{p.status.replace('_', ' ')}</Badge></div>
                 <div className="font-mono" style={{ marginTop: 6, fontSize: 10.5, color: 'var(--color-parchment-muted)' }}>{p.topics?.label ?? 'Topic'} · {p.region} · by {p.profiles?.handle ?? 'verified user'}</div>
+                {p.revision_count ? <div className="font-mono" style={{ marginTop: 5, fontSize: 10.5, color: 'var(--color-parchment-muted)' }}>revision {p.revision_count}</div> : null}
                 {p.moderator_notes && <p style={{ margin: '7px 0 0', fontSize: 12, color: 'var(--color-parchment-ink-soft)', lineHeight: 1.45 }}>Moderator note: {p.moderator_notes}</p>}
-                {p.poll_id && <Link href={`/polls/${p.poll_id}`} style={{ display: 'inline-block', marginTop: 7, fontSize: 12, color: 'var(--color-parchment-accent)' }}>View draft/poll →</Link>}
+                {p.appeal_reason && <p style={{ margin: '7px 0 0', fontSize: 12, color: 'var(--color-parchment-amber)', lineHeight: 1.45 }}>Appeal: {p.appeal_reason}</p>}
+                <div style={{ display: 'flex', gap: 10, alignItems: 'center', flexWrap: 'wrap', marginTop: p.poll_id || ['changes_requested', 'rejected'].includes(p.status) ? 7 : 0 }}>
+                  {p.poll_id && <Link href={`/polls/${p.poll_id}`} style={{ fontSize: 12, color: 'var(--color-parchment-accent)' }}>View draft/poll →</Link>}
+                  {signedIn && ['changes_requested', 'rejected'].includes(p.status) && <button onClick={() => loadProposalForRevision(p)} style={{ padding: 0, fontSize: 12, fontFamily: 'inherit', color: 'var(--color-parchment-accent)', background: 'transparent', border: 'none', cursor: 'pointer' }}>Revise as new proposal</button>}
+                  {signedIn && p.status === 'rejected' && <button onClick={() => appealProposal(p.id)} disabled={actioningProposal === p.id} style={{ padding: 0, fontSize: 12, fontFamily: 'inherit', color: 'var(--color-parchment-amber)', background: 'transparent', border: 'none', cursor: 'pointer', opacity: actioningProposal === p.id ? 0.5 : 1 }}>Appeal rejection</button>}
+                </div>
               </div>
             ))}
           </section>

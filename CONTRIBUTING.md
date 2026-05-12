@@ -44,6 +44,35 @@ npx supabase link --project-ref <your-project-ref>
 npx supabase db query --linked -f packages/db/migrations/<file>.sql
 ```
 
+## Product contribution standards
+
+### Poll proposals and templates
+
+When contributing a poll idea or source template, include:
+
+- **Question** — short, neutral, and resolvable.
+- **Topic** — one existing CivicSignal topic where possible.
+- **Region** — global, regional, national, or local jurisdiction.
+- **Options** — at least two clear outcomes.
+- **Source-of-truth** — a single official source or named publication.
+- **Resolution criteria** — exactly what counts, what does not, and which timestamp/timezone matters.
+
+Avoid questions that depend on vibes, opinion polling, private data, or subjective expert judgment. If the answer cannot be resolved from a public source, it is not ready.
+
+### Moderation and appeals
+
+Proposal moderation should preserve public notes. Use:
+
+- `pending` for new or revised proposals.
+- `changes_requested` when the idea is promising but underspecified.
+- `rejected` when it is out of scope, subjective, unsafe, or not publicly resolvable.
+- `appealed` when the proposer asks moderators to reconsider a rejection.
+- `approved` only when it has been turned into a draft poll.
+
+### Trust-surface alignment
+
+When a feature changes CivicSignal's trust model, update the public surfaces in the same PR: homepage, methodology, roadmap, README, and any relevant smoke script. Stale public methodology is a bug.
+
 ## Workflow
 
 1. **Branch** — create a feature branch from `main`:
@@ -51,10 +80,16 @@ npx supabase db query --linked -f packages/db/migrations/<file>.sql
    git checkout -b feat/your-feature
    ```
 2. **Code** — follow the style guide below.
-3. **Typecheck and lint** before opening a PR:
+3. **Typecheck, build, and test** before opening a PR:
    ```bash
    pnpm typecheck
-   pnpm lint
+   pnpm --filter @civicsignal/web build
+   corepack pnpm -r test
+   ```
+4. **Run lifecycle smoke checks** when touching proposal, poll, dispute, panel, or audit flows:
+   ```bash
+   node scripts/smoke-proposal-lifecycle.mjs
+   node scripts/smoke-trusted-panels.mjs
    ```
 4. **Pull request** — open a PR against `main`. Describe what the change does and why.
 

@@ -26,7 +26,20 @@ CivicSignal is a global, open-source, verified-human civic polling network where
 
 ### User-facing pitch
 
-Vote on real-world questions. Build reputation when your judgment proves right. Help create a more accountable democratic signal layer.
+Vote on real-world questions. Propose new civic polls. Build reputation when your judgment proves right. Help create a more accountable democratic signal layer.
+
+### Current product loop
+
+CivicSignal now treats poll creation as a visible civic workflow, not a hidden admin action:
+
+1. Verified users propose polls with question, topic, region, options, cutoff, source-of-truth, and resolution criteria.
+2. The public proposal log shows pending, approved, rejected, change-requested, and appealed proposals with moderator notes.
+3. Admins and trusted panels moderate proposals into draft polls, request changes, reject, or reconsider appeals.
+4. Approved drafts can be published for sealed voting.
+5. Polls resolve against pre-declared sources, open a dispute window, and can receive trusted-panel review.
+6. Topic reputation updates only after objective resolution.
+
+Public pages that must stay aligned with shipped features: `/`, `/methodology`, `/roadmap`, `/proposals`, `/panels`, `/verify`, and this README.
 
 ### Serious positioning
 
@@ -192,6 +205,18 @@ The platform should verify humanness, not expose identity. Public users can rema
 - Earned only through correct outcomes
 - Decays or stabilizes over time to prevent ancient reputation from dominating forever
 - Public enough to be trusted, private enough to avoid harassment
+
+### Poll proposal and source-template standards
+
+Good CivicSignal polls must be:
+
+- Resolvable from one named public source before launch.
+- Region-specific when law, jurisdiction, election authority, or publication source matters.
+- Written in plain English with unambiguous outcome options.
+- Paired with resolution criteria that say what does *not* count: leaks, drafts, media calls, projections, or unofficial briefings.
+- Moderated publicly: rejection/change notes remain visible, and rejected proposals can be appealed.
+
+Seed source templates cover EU Commission/EUR-Lex, US Federal Register, UN vote records, certified elections, IPCC/IEA publications, WHO emergency statements, court rulings, central banks, and local councils.
 
 ### Topic categories
 

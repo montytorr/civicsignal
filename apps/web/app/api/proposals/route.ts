@@ -21,7 +21,7 @@ const validateProposal = (body: any) => {
 export const GET = async () => {
   const db = createServiceClient()
   const { data, error } = await t(db, 'poll_proposals')
-    .select('id, question, region, options, source_of_truth, resolution_criteria, cutoff_at, resolves_at, status, moderator_notes, poll_id, created_at, moderated_at, topics(slug, label), profiles!poll_proposals_proposed_by_fkey(handle)')
+    .select('id, question, region, options, source_of_truth, resolution_criteria, cutoff_at, resolves_at, status, moderator_notes, poll_id, revision_count, appeal_reason, appealed_at, created_at, moderated_at, topics(slug, label), profiles!poll_proposals_proposed_by_fkey(handle)')
     .order('created_at', { ascending: false })
     .limit(100)
   if (error) return NextResponse.json({ success: false, error: error.message }, { status: 500 })
