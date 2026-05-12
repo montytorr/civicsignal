@@ -3,6 +3,7 @@ import { CsWordmark } from '@civicsignal/ui'
 
 const PLATFORM_LINKS = [
   { label: 'Active polls', href: '/polls' },
+  { label: 'Proposals', href: '/proposals' },
   { label: 'Methodology', href: '/methodology' },
   { label: 'Roadmap', href: '/roadmap' },
   { label: 'Admin', href: '/admin' },

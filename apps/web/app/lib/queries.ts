@@ -370,3 +370,39 @@ export const getMyPanelWorkspace = async () => {
     })),
   }
 }
+
+export const getSourceTemplates = async () => {
+  const supabase = await createClient()
+  const { data } = await (supabase as any)
+    .from('source_templates')
+    .select('*')
+    .order('region')
+    .order('label')
+    .then((r: any) => r)
+    .catch(() => ({ data: [] }))
+  return data ?? []
+}
+
+export const getPollProposals = async (limit = 100) => {
+  const supabase = await createClient()
+  const { data } = await (supabase as any)
+    .from('poll_proposals')
+    .select('*, topics(slug, label), profiles(handle)')
+    .order('created_at', { ascending: false })
+    .limit(limit)
+    .then((r: any) => r)
+    .catch(() => ({ data: [] }))
+  return data ?? []
+}
+
+export const getPendingPollProposals = async () => {
+  const supabase = await createClient()
+  const { data } = await (supabase as any)
+    .from('poll_proposals')
+    .select('*, topics(slug, label), profiles(handle)')
+    .eq('status', 'pending')
+    .order('created_at', { ascending: true })
+    .then((r: any) => r)
+    .catch(() => ({ data: [] }))
+  return data ?? []
+}

@@ -37,6 +37,22 @@ type Dispute = {
   reviews?: Array<{ id: string; decision: string; rationale: string; created_at: string; profiles?: { handle: string } | null }>
 }
 
+type PollProposal = {
+  id: string
+  question: string
+  topic_id: string
+  region: string
+  options: string[]
+  source_of_truth: string
+  resolution_criteria: string
+  cutoff_at: string
+  resolves_at: string
+  status: string
+  created_at: string
+  profiles?: { handle: string } | null
+  topics?: { label: string } | null
+}
+
 type PanelCandidate = {
   user_id: string
   topic_id: string
@@ -153,12 +169,14 @@ export const AdminPage = ({
   awaitingResolution: initialAwaitingResolution,
   auditStats,
   panelCandidates,
+  pendingProposals,
 }: {
   topics: Topic[]
   disputes: Dispute[]
   awaitingResolution: AwaitingPoll[]
   auditStats: AuditStats
   panelCandidates: PanelCandidate[]
+  pendingProposals: PollProposal[]
 }) => {
   const [question, setQuestion] = useState('Will the IPCC AR7 Synthesis Report be published before 31 December 2026?')
   const [topicId, setTopicId] = useState(topics[0]?.id ?? '')
@@ -180,6 +198,9 @@ export const AdminPage = ({
   const [candidateKey, setCandidateKey] = useState(panelCandidates.find((c) => !c.panelStatus)?.user_id + ':' + panelCandidates.find((c) => !c.panelStatus)?.topic_id || '')
   const [inviteMinRep, setInviteMinRep] = useState('1')
   const [invitingPanelist, setInvitingPanelist] = useState(false)
+  const [proposalList, setProposalList] = useState<PollProposal[]>(pendingProposals)
+  const [proposalNotes, setProposalNotes] = useState<Record<string, string>>({})
+  const [proposalLoading, setProposalLoading] = useState<string | null>(null)
   const [awaitingResolution, setAwaitingResolution] = useState<AwaitingPoll[]>(initialAwaitingResolution)
   const [resolveStates, setResolveStates] = useState<Record<string, ResolveState>>({})
   const [expandedResolve, setExpandedResolve] = useState<string | null>(null)
@@ -364,6 +385,30 @@ export const AdminPage = ({
       setError('Network error — please try again')
     } finally {
       setPublishing(false)
+    }
+  }
+
+  const moderateProposal = async (proposalId: string, action: 'approve' | 'reject' | 'changes_requested') => {
+    setProposalLoading(proposalId)
+    setError(null)
+    setNotice(null)
+    try {
+      const res = await fetch(`/api/admin/proposals/${proposalId}`, {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ action, moderatorNotes: proposalNotes[proposalId] ?? undefined }),
+      })
+      const data = await res.json()
+      if (!res.ok || !data.success) {
+        setError(data.error ?? 'Failed to moderate proposal')
+        return
+      }
+      setProposalList((prev) => prev.filter((p) => p.id !== proposalId))
+      setNotice(action === 'approve' ? `Proposal approved into draft poll · ${data.poll?.id}` : `Proposal marked ${action.replace('_', ' ')}`)
+    } catch {
+      setError('Network error — please try again')
+    } finally {
+      setProposalLoading(null)
     }
   }
 
@@ -747,6 +792,39 @@ export const AdminPage = ({
                   )
                 })
               )}
+            </div>
+
+            {/* Proposal moderation */}
+            <div style={{
+              background: 'var(--color-parchment-surface)',
+              border: '1px solid var(--color-parchment-line)',
+              borderRadius: 4,
+            }}>
+              <div style={{ padding: '16px 20px', borderBottom: '1px solid var(--color-parchment-line-soft)', display: 'flex', justifyContent: 'space-between', alignItems: 'baseline' }}>
+                <Eyebrow>Proposal moderation</Eyebrow>
+                <span className="font-mono" style={{ fontSize: 12, color: 'var(--color-parchment-ink)' }}>{proposalList.length}</span>
+              </div>
+              {proposalList.length === 0 ? (
+                <div style={{ padding: '14px 20px', fontSize: 13, color: 'var(--color-parchment-muted)' }}>No pending proposals.</div>
+              ) : proposalList.map((proposal, i) => (
+                <div key={proposal.id} style={{ padding: '14px 20px', borderTop: i === 0 ? 'none' : '1px solid var(--color-parchment-line-soft)' }}>
+                  <div style={{ fontSize: 13.5, color: 'var(--color-parchment-ink)', lineHeight: 1.4 }}>{proposal.question}</div>
+                  <div className="font-mono" style={{ marginTop: 6, fontSize: 10.5, color: 'var(--color-parchment-muted)', letterSpacing: '0.04em', textTransform: 'uppercase' }}>
+                    {proposal.topics?.label ?? 'Topic'} · {proposal.region} · {proposal.profiles?.handle ?? 'verified user'}
+                  </div>
+                  <textarea
+                    value={proposalNotes[proposal.id] ?? ''}
+                    onChange={(e) => setProposalNotes((prev) => ({ ...prev, [proposal.id]: e.target.value }))}
+                    placeholder="Moderator notes…"
+                    style={{ width: '100%', minHeight: 44, marginTop: 8, padding: '7px 9px', fontSize: 11.5, fontFamily: 'inherit', color: 'var(--color-parchment-ink)', background: 'var(--color-parchment-bg)', border: '1px solid var(--color-parchment-line)', borderRadius: 3, resize: 'vertical', outline: 'none', boxSizing: 'border-box' }}
+                  />
+                  <div style={{ display: 'flex', gap: 6, marginTop: 8, flexWrap: 'wrap' }}>
+                    <button onClick={() => moderateProposal(proposal.id, 'approve')} disabled={proposalLoading === proposal.id} style={{ padding: '4px 10px', fontSize: 11, fontFamily: 'inherit', color: 'var(--color-parchment-green)', background: 'transparent', border: '1px solid var(--color-parchment-green)', borderRadius: 3, cursor: 'pointer', opacity: proposalLoading === proposal.id ? 0.5 : 1 }}>Approve draft</button>
+                    <button onClick={() => moderateProposal(proposal.id, 'changes_requested')} disabled={proposalLoading === proposal.id} style={{ padding: '4px 10px', fontSize: 11, fontFamily: 'inherit', color: 'var(--color-parchment-amber)', background: 'transparent', border: '1px solid var(--color-parchment-amber)', borderRadius: 3, cursor: 'pointer', opacity: proposalLoading === proposal.id ? 0.5 : 1 }}>Request changes</button>
+                    <button onClick={() => moderateProposal(proposal.id, 'reject')} disabled={proposalLoading === proposal.id} style={{ padding: '4px 10px', fontSize: 11, fontFamily: 'inherit', color: 'var(--color-parchment-muted)', background: 'transparent', border: '1px solid var(--color-parchment-line)', borderRadius: 3, cursor: 'pointer', opacity: proposalLoading === proposal.id ? 0.5 : 1 }}>Reject</button>
+                  </div>
+                </div>
+              ))}
             </div>
 
             {/* Panel invitations */}

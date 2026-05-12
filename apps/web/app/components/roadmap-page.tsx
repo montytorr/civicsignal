@@ -44,8 +44,8 @@ const PHASES = [
     description:
       'Communities can create structured civic questions, debates, and resolutions. Region-aware question authoring with locale-specific resolution sources enables cross-border civic intelligence.',
     milestones: [
-      { label: 'Community poll authoring', done: false },
-      { label: 'Region-specific resolution sources', done: false },
+      { label: 'Community poll authoring', done: true },
+      { label: 'Region-specific resolution sources', done: true },
       { label: 'Structured debate format', done: false },
       { label: 'Cross-jurisdiction aggregation', done: false },
       { label: 'Locale-aware question templates', done: false },
@@ -110,7 +110,7 @@ export const RoadmapPage = () => (
         }}
       >
         <div>
-          <Eyebrow>Democracy roadmap · v0.7</Eyebrow>
+          <Eyebrow>Democracy roadmap · v0.8</Eyebrow>
           <h1
             style={{
               margin: '14px 0 0',
