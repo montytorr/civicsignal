@@ -25,6 +25,8 @@ export const mapDbPollToUiPoll = (dbPoll: any, voteCount: number, hasVoted: bool
     participants: voteCount,
     options: Array.isArray(dbPoll.options) ? dbPoll.options : JSON.parse(dbPoll.options),
     source: dbPoll.source_of_truth,
+    resolutionCriteria: dbPoll.resolution_criteria ?? null,
+    createdAt: dbPoll.created_at ?? null,
     status: dbPoll.status === 'resolved' ? 'resolved' : (diff <= 0 ? 'closed' : 'active'),
     answered: hasVoted,
   }

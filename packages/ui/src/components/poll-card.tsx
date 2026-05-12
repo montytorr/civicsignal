@@ -13,6 +13,8 @@ export type Poll = {
   participants: number
   options: string[]
   source: string
+  resolutionCriteria?: string | null
+  createdAt?: string | null
   status: 'active' | 'closed' | 'resolved'
   answered?: boolean
 }

@@ -53,6 +53,11 @@ export const PollDetailPage = ({ poll, existingVote, publicKey }: Props) => {
     : null
   const isOpen = poll.status === 'active'
   const canSubmit = isOpen && !!choice && !submitted && !loading
+  const openedLabel = poll.createdAt
+    ? new Date(poll.createdAt).toISOString().replace('T', ' ').slice(0, 16) + ' UTC'
+    : null
+  const cutoffLabel = new Date(poll.cutoff).toISOString().replace('T', ' ').slice(0, 16) + ' UTC'
+  const resolutionDateLabel = poll.resolves
 
   return (
     <div style={{ background: 'var(--color-parchment-bg)', color: 'var(--color-parchment-ink)', minHeight: '100%' }}>
@@ -84,6 +89,34 @@ export const PollDetailPage = ({ poll, existingVote, publicKey }: Props) => {
         <h1 style={{ margin: '20px 0 0', fontSize: 40, fontWeight: 500, lineHeight: 1.15, letterSpacing: '-0.02em', color: 'var(--color-parchment-ink)', textWrap: 'balance' as React.CSSProperties['textWrap'], maxWidth: 880 }}>
           {poll.q}
         </h1>
+
+        <section
+          className="cs-detail-grid"
+          style={{
+            display: 'grid',
+            gridTemplateColumns: '1.2fr 0.8fr',
+            gap: 16,
+            marginTop: 28,
+          }}
+        >
+          <div style={{ background: 'var(--color-parchment-surface)', border: '1px solid var(--color-parchment-line)', borderRadius: 4, padding: '20px 22px' }}>
+            <Eyebrow>Resolution criteria</Eyebrow>
+            <p style={{ margin: '10px 0 0', fontSize: 14, color: 'var(--color-parchment-ink)', lineHeight: 1.58 }}>
+              {poll.resolutionCriteria?.trim() || 'No additional resolution criteria were supplied. The resolver is bound to the named source-of-truth and the published options.'}
+            </p>
+          </div>
+          <div style={{ background: 'var(--color-parchment-surface)', border: '1px solid var(--color-parchment-line)', borderRadius: 4, padding: '20px 22px' }}>
+            <Eyebrow>Poll status</Eyebrow>
+            <div style={{ display: 'grid', gridTemplateColumns: '1fr auto', gap: '8px 18px', marginTop: 12, fontSize: 12.5, color: 'var(--color-parchment-ink-soft)' }}>
+              <span>Voting status</span>
+              <span className="font-mono" style={{ color: 'var(--color-parchment-ink)', textTransform: 'uppercase' }}>{poll.status}</span>
+              <span>Resolution date</span>
+              <span className="font-mono" style={{ color: 'var(--color-parchment-ink)' }}>{resolutionDateLabel}</span>
+              <span>Current answers</span>
+              <span className="font-mono" style={{ color: 'var(--color-parchment-ink)', fontVariantNumeric: 'tabular-nums' }}>{poll.participants.toLocaleString()}</span>
+            </div>
+          </div>
+        </section>
 
         {/* Two-column grid */}
         <div className="cs-detail-grid" style={{ display: 'grid', gridTemplateColumns: '1.4fr 1fr', gap: 48, marginTop: 40 }}>
@@ -254,6 +287,37 @@ export const PollDetailPage = ({ poll, existingVote, publicKey }: Props) => {
               <p style={{ margin: '6px 0 0', fontSize: 12, color: 'var(--color-parchment-muted)' }}>
                 Named before this poll opened. The resolver is bound to this source.
               </p>
+            </div>
+
+            {/* Timeline card */}
+            <div style={{ background: 'var(--color-parchment-surface)', border: '1px solid var(--color-parchment-line)', borderRadius: 4, padding: '20px 22px' }}>
+              <Eyebrow>Timeline</Eyebrow>
+              <div style={{ display: 'flex', flexDirection: 'column', gap: 10, marginTop: 12 }}>
+                {openedLabel && (
+                  <div style={{ display: 'flex', justifyContent: 'space-between', gap: 18, fontSize: 12.5 }}>
+                    <span style={{ color: 'var(--color-parchment-ink-soft)' }}>Opened</span>
+                    <span className="font-mono" style={{ color: 'var(--color-parchment-muted)', textAlign: 'right' }}>{openedLabel}</span>
+                  </div>
+                )}
+                <div style={{ display: 'flex', justifyContent: 'space-between', gap: 18, fontSize: 12.5 }}>
+                  <span style={{ color: 'var(--color-parchment-ink-soft)' }}>Cutoff</span>
+                  <span className="font-mono" style={{ color: 'var(--color-parchment-muted)', textAlign: 'right' }}>{cutoffLabel}</span>
+                </div>
+                <div style={{ display: 'flex', justifyContent: 'space-between', gap: 18, fontSize: 12.5 }}>
+                  <span style={{ color: 'var(--color-parchment-ink-soft)' }}>Resolves</span>
+                  <span className="font-mono" style={{ color: 'var(--color-parchment-muted)', textAlign: 'right' }}>{resolutionDateLabel}</span>
+                </div>
+              </div>
+            </div>
+
+            {/* Mechanics card */}
+            <div style={{ background: 'var(--color-parchment-surface)', border: '1px solid var(--color-parchment-line)', borderRadius: 4, padding: '20px 22px' }}>
+              <Eyebrow>Voting mechanics</Eyebrow>
+              <ul style={{ margin: '10px 0 0', paddingLeft: 18, fontSize: 12.5, color: 'var(--color-parchment-muted)', lineHeight: 1.55 }}>
+                <li>One sealed answer per verified human.</li>
+                <li>Totals stay hidden until the cutoff passes.</li>
+                <li>Reputation is awarded only after the named source resolves the poll.</li>
+              </ul>
             </div>
 
             {/* Reputation impact card */}
