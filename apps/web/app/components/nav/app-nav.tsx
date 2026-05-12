@@ -11,6 +11,7 @@ const BASE_TABS = [
   { label: 'Active polls', href: '/polls' },
   { label: 'Methodology', href: '/methodology' },
   { label: 'Roadmap', href: '/roadmap' },
+  { label: 'Leaderboard', href: '/leaderboard' },
   { label: 'Archive', href: '/archive' },
 ]
 
@@ -70,7 +71,8 @@ export const AppNav = () => {
   ]
 
   const isActive = (href: string) => {
-    if (href === '/polls') return pathname === '/polls' || pathname.startsWith('/polls/')
+    if (href === '/archive') return pathname === '/archive' || pathname.endsWith('/resolved')
+    if (href === '/polls') return pathname === '/polls' || (pathname.startsWith('/polls/') && !pathname.endsWith('/resolved'))
     if (href.startsWith('/u/')) return pathname.startsWith('/u/')
     return pathname === href || pathname.startsWith(href + '/')
   }
@@ -93,14 +95,17 @@ export const AppNav = () => {
               <Link
                 key={href}
                 href={href}
-                className="relative transition-colors"
+                className="relative transition-colors rounded-[3px]"
+                aria-current={active ? 'page' : undefined}
                 style={{
-                  padding: '0 14px',
+                  padding: '7px 14px 8px',
                   fontSize: 13.5,
-                  fontWeight: active ? 500 : 400,
+                  fontWeight: active ? 600 : 450,
                   color: active
                     ? 'var(--color-parchment-ink)'
                     : 'var(--color-parchment-ink-soft)',
+                  background: active ? 'var(--color-parchment-surface)' : 'transparent',
+                  border: active ? '1px solid var(--color-parchment-line-soft)' : '1px solid transparent',
                   textDecoration: 'none',
                   whiteSpace: 'nowrap',
                 }}

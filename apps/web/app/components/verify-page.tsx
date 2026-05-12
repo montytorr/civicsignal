@@ -93,6 +93,7 @@ export const VerifyPage = ({ commitments, receiptHash }: Props) => (
         </p>
       ) : (
         <>
+          <div className="cs-table-scroll">
           {/* Column headers */}
           <div
             style={{
@@ -197,6 +198,7 @@ export const VerifyPage = ({ commitments, receiptHash }: Props) => (
               </span>
             </div>
           ))}
+          </div>
         </>
       )}
     </section>

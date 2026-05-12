@@ -18,9 +18,14 @@ export const FeedPage = ({ polls, topics }: Props) => {
   const [sort, setSort] = useState<SortOption>('Cutoff')
   const [region, setRegion] = useState('All regions')
 
-  const filtered = polls.filter(
-    (poll) => topic === 'All' || topicById(poll.topic)?.label === topic,
-  )
+  const filtered = polls
+    .filter((poll) => topic === 'All' || topicById(poll.topic)?.label === topic)
+    .filter((poll) => region === 'All regions' || poll.region === region)
+    .sort((a, b) => {
+      if (sort === 'Newest') return b.id.localeCompare(a.id)
+      if (sort === 'Popular') return b.participants - a.participants
+      return new Date(a.cutoff).getTime() - new Date(b.cutoff).getTime()
+    })
 
   return (
     <div style={{ background: 'var(--color-parchment-bg)', color: 'var(--color-parchment-ink)', minHeight: '100%' }}>
@@ -128,11 +133,32 @@ export const FeedPage = ({ polls, topics }: Props) => {
         </div>
 
         {/* Poll grid */}
-        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: 16 }}>
-          {filtered.map((poll) => (
-            <PollCard key={poll.id} poll={poll} href={`/polls/${poll.id}`} />
-          ))}
-        </div>
+        {filtered.length === 0 ? (
+          <div style={{
+            padding: '48px 28px',
+            background: 'var(--color-parchment-surface)',
+            border: '1px solid var(--color-parchment-line)',
+            borderRadius: 4,
+            textAlign: 'center',
+            fontSize: 14,
+            color: 'var(--color-parchment-muted)',
+          }}>
+            <div>No active polls match those filters.</div>
+            <button
+              onClick={() => { setTopic('All'); setRegion('All regions'); setSort('Cutoff') }}
+              className="font-mono"
+              style={{ marginTop: 14, fontSize: 11, color: 'var(--color-parchment-accent)', background: 'transparent', border: 'none', cursor: 'pointer', letterSpacing: '0.04em' }}
+            >
+              RESET FILTERS
+            </button>
+          </div>
+        ) : (
+          <div className="cs-responsive-grid" style={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: 16 }}>
+            {filtered.map((poll) => (
+              <PollCard key={poll.id} poll={poll} href={`/polls/${poll.id}`} />
+            ))}
+          </div>
+        )}
       </main>
     </div>
   )

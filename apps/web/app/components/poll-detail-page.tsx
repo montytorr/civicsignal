@@ -51,6 +51,8 @@ export const PollDetailPage = ({ poll, existingVote, publicKey }: Props) => {
   const receiptTs = receipt?.timestamp
     ? new Date(receipt.timestamp).toISOString().replace('T', ' ').slice(0, 16) + ' UTC'
     : null
+  const isOpen = poll.status === 'active'
+  const canSubmit = isOpen && !!choice && !submitted && !loading
 
   return (
     <div style={{ background: 'var(--color-parchment-bg)', color: 'var(--color-parchment-ink)', minHeight: '100%' }}>
@@ -84,7 +86,7 @@ export const PollDetailPage = ({ poll, existingVote, publicKey }: Props) => {
         </h1>
 
         {/* Two-column grid */}
-        <div style={{ display: 'grid', gridTemplateColumns: '1.4fr 1fr', gap: 48, marginTop: 40 }}>
+        <div className="cs-detail-grid" style={{ display: 'grid', gridTemplateColumns: '1.4fr 1fr', gap: 48, marginTop: 40 }}>
           {/* Left col — answer */}
           <div>
             <Eyebrow>{submitted ? 'Your answer is sealed' : 'Choose your answer'}</Eyebrow>
@@ -95,7 +97,7 @@ export const PollDetailPage = ({ poll, existingVote, publicKey }: Props) => {
                 return (
                   <button
                     key={opt}
-                    onClick={() => { if (!submitted) setChoice(opt) }}
+                    onClick={() => { if (isOpen && !submitted) setChoice(opt) }}
                     style={{
                       display: 'flex',
                       alignItems: 'center',
@@ -108,7 +110,7 @@ export const PollDetailPage = ({ poll, existingVote, publicKey }: Props) => {
                       border: `1px solid ${sel ? 'var(--color-parchment-ink)' : 'var(--color-parchment-line)'}`,
                       borderRadius: 4,
                       textAlign: 'left',
-                      cursor: submitted ? 'default' : 'pointer',
+                      cursor: submitted || !isOpen ? 'default' : 'pointer',
                       letterSpacing: '-0.01em',
                       fontFamily: 'inherit',
                     }}
@@ -133,7 +135,18 @@ export const PollDetailPage = ({ poll, existingVote, publicKey }: Props) => {
               })}
             </div>
 
-            {submitted ? (
+            {!isOpen && !submitted ? (
+              <div style={{ marginTop: 24, padding: '18px 22px', background: 'var(--color-parchment-surface)', border: '1px solid var(--color-parchment-amber)', borderRadius: 4 }}>
+                <Eyebrow>{poll.status === 'closed' ? 'Voting closed' : 'Poll resolved'}</Eyebrow>
+                <p style={{ margin: '10px 0 0', fontSize: 13.5, color: 'var(--color-parchment-ink-soft)', lineHeight: 1.55 }}>
+                  This poll is no longer accepting sealed votes. {poll.status === 'resolved' ? 'Open the resolution record to review the outcome and evidence.' : 'The resolver is waiting for the named source-of-truth before publishing the outcome.'}
+                </p>
+                <div style={{ display: 'flex', gap: 10, marginTop: 16 }}>
+                  <Btn kind="ghost" size="sm"><Link href="/polls" style={{ textDecoration: 'none', color: 'inherit' }}>Back to feed</Link></Btn>
+                  {poll.status === 'resolved' && <Btn kind="quiet" size="sm"><Link href={`/polls/${poll.id}/resolved`} style={{ textDecoration: 'none', color: 'inherit' }}>View resolution →</Link></Btn>}
+                </div>
+              </div>
+            ) : submitted ? (
               /* Receipt panel */
               <div style={{ marginTop: 24, padding: '18px 22px', background: 'var(--color-parchment-surface)', border: '1px solid var(--color-parchment-green)', borderRadius: 4 }}>
                 <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
@@ -184,7 +197,7 @@ export const PollDetailPage = ({ poll, existingVote, publicKey }: Props) => {
                     kind="primary"
                     size="lg"
                     onClick={handleSubmit}
-                    style={{ opacity: choice && !loading ? 1 : 0.4, pointerEvents: choice && !loading ? 'auto' : 'none' }}
+                    disabled={!canSubmit}
                   >
                     {loading ? 'Sealing…' : 'Seal my answer'}
                   </Btn>

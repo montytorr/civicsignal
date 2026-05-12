@@ -1,6 +1,7 @@
 import type { Metadata } from 'next'
 import { Inter, IBM_Plex_Mono } from 'next/font/google'
 import { AppNav } from '@/components/nav/app-nav'
+import { RouteBreadcrumbs } from '@/components/nav/route-breadcrumbs'
 import { Footer } from '@/components/footer'
 import './globals.css'
 
@@ -28,6 +29,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
     <html lang="en" className={`${inter.variable} ${ibmPlexMono.variable}`}>
       <body className="bg-parchment-bg text-parchment-ink">
         <AppNav />
+        <RouteBreadcrumbs />
         <div className="min-h-screen">{children}</div>
         <Footer />
       </body>

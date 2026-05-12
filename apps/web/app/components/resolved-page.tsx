@@ -42,11 +42,11 @@ export const ResolvedPage = ({
       <main style={{ padding: '32px 40px 80px', maxWidth: 1100, margin: '0 auto' }}>
         {/* Back link */}
         <Link
-          href="/polls"
+          href="/archive"
           className="font-mono"
           style={{ fontSize: 11.5, color: 'var(--color-parchment-muted)', letterSpacing: '0.04em', textDecoration: 'none', cursor: 'pointer' }}
         >
-          ← ARCHIVE
+          ← BACK TO ARCHIVE
         </Link>
 
         {/* Meta row */}
@@ -69,7 +69,7 @@ export const ResolvedPage = ({
         </h1>
 
         {/* Two-column grid */}
-        <div style={{ display: 'grid', gridTemplateColumns: '1.4fr 1fr', gap: 48, marginTop: 40 }}>
+        <div className="cs-detail-grid" style={{ display: 'grid', gridTemplateColumns: '1.4fr 1fr', gap: 48, marginTop: 40 }}>
           {/* Left col */}
           <div>
             <Eyebrow>Outcome</Eyebrow>

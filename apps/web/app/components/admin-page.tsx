@@ -187,6 +187,13 @@ export const AdminPage = ({
   const handleResolveSubmit = async (pollId: string) => {
     const state = resolveStates[pollId]
     if (!state) return
+    if (!state.outcome || !state.notes.trim() || !state.sourceUrl.trim()) {
+      setResolveStates((prev) => ({
+        ...prev,
+        [pollId]: { ...prev[pollId], error: 'Outcome, notes, and source URL are required before resolving.' },
+      }))
+      return
+    }
     setResolveStates((prev) => ({ ...prev, [pollId]: { ...prev[pollId], loading: true, error: null } }))
     try {
       const res = await fetch(`/api/admin/polls/${pollId}/resolve`, {
@@ -212,13 +219,33 @@ export const AdminPage = ({
     }
   }
 
+  const cleanedOptions = () => options.map((o) => o.trim()).filter(Boolean)
+
+  const validatePollForm = () => {
+    const trimmedQuestion = question.trim()
+    const trimmedSource = sourceOfTruth.trim()
+    const trimmedCriteria = resolutionCriteria.trim()
+    const cutoffDate = new Date(cutoffAt.trim())
+    const resolvesDate = new Date(resolvesAt.trim())
+
+    if (!trimmedQuestion) return 'Question is required.'
+    if (!topicId) return 'Topic is required.'
+    if (cleanedOptions().length < 2) return 'Add at least two outcome options.'
+    if (!trimmedSource) return 'Source-of-truth is required before a poll can be saved.'
+    if (!trimmedCriteria) return 'Resolution criteria are required.'
+    if (Number.isNaN(cutoffDate.getTime())) return 'Cutoff must be a valid UTC date/time.'
+    if (Number.isNaN(resolvesDate.getTime())) return 'Resolution date must be a valid UTC date/time.'
+    if (cutoffDate >= resolvesDate) return 'Cutoff must be before the resolution date.'
+    return null
+  }
+
   const buildPollPayload = () => ({
-    question,
+    question: question.trim(),
     topicId,
     region,
-    options: options.filter((o) => o.trim()),
-    sourceOfTruth,
-    resolutionCriteria,
+    options: cleanedOptions(),
+    sourceOfTruth: sourceOfTruth.trim(),
+    resolutionCriteria: resolutionCriteria.trim(),
     cutoffAt: new Date(cutoffAt.trim()).toISOString(),
     resolvesAt: new Date(resolvesAt.trim()).toISOString(),
   })
@@ -235,6 +262,11 @@ export const AdminPage = ({
     setError(null)
     setNotice(null)
     try {
+      const validationError = validatePollForm()
+      if (validationError) {
+        setError(validationError)
+        return
+      }
       const createRes = await fetch('/api/admin/polls', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -258,6 +290,11 @@ export const AdminPage = ({
     setError(null)
     setNotice(null)
     try {
+      const validationError = validatePollForm()
+      if (validationError) {
+        setError(validationError)
+        return
+      }
       const createRes = await fetch('/api/admin/polls', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -292,7 +329,7 @@ export const AdminPage = ({
       <main style={{ padding: '32px 40px 80px', maxWidth: 1280, margin: '0 auto' }}>
 
         {/* Page header */}
-        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline' }}>
+        <div className="cs-stack-mobile" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline' }}>
           <div>
             <Eyebrow>Resolver workspace · internal</Eyebrow>
             <h1 style={{
@@ -304,7 +341,7 @@ export const AdminPage = ({
             </h1>
           </div>
           <div style={{ display: 'flex', gap: 10 }}>
-            <Btn kind="ghost" size="md">Audit log</Btn>
+            <Btn kind="ghost" size="md" onClick={() => { window.location.href = '/verify' }}>Audit log</Btn>
             <Btn kind="primary" size="md" onClick={handlePublish} disabled={publishing}>
               {publishing ? 'Publishing…' : 'Publish poll'}
             </Btn>
@@ -336,7 +373,7 @@ export const AdminPage = ({
         )}
 
         {/* Two-col grid */}
-        <div style={{
+        <div className="cs-detail-grid" style={{
           display: 'grid', gridTemplateColumns: '1.3fr 1fr',
           gap: 32, marginTop: 32,
         }}>
@@ -373,7 +410,7 @@ export const AdminPage = ({
             </Field>
 
             {/* Topic + Region */}
-            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 18 }}>
+            <div className="cs-form-grid" style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 18 }}>
               <Field label="Topic">
                 <SelectField value={topicId} options={topicOptions} onChange={setTopicId} />
               </Field>
@@ -429,7 +466,7 @@ export const AdminPage = ({
             </Field>
 
             {/* Cutoff + Resolution date */}
-            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 18 }}>
+            <div className="cs-form-grid" style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 18 }}>
               <Field label="Cutoff (UTC)">
                 <input
                   value={cutoffAt}
@@ -624,7 +661,7 @@ export const AdminPage = ({
                               kind="primary"
                               size="md"
                               onClick={() => handleResolveSubmit(poll.id)}
-                              disabled={rs.loading}
+                              disabled={rs.loading || !rs.outcome || !rs.notes.trim() || !rs.sourceUrl.trim()}
                             >
                               {rs.loading ? 'Resolving…' : 'Confirm resolution'}
                             </Btn>

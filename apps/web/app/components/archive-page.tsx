@@ -168,7 +168,7 @@ export const ArchivePage = ({ polls }: { polls: ResolvedPoll[] }) => {
             No polls have been resolved yet.
           </div>
         ) : (
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: 16 }}>
+          <div className="cs-responsive-grid" style={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: 16 }}>
             {polls.map((poll) => (
               <ArchiveCard key={poll.id} poll={poll} />
             ))}

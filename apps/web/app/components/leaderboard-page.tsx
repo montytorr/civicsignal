@@ -117,11 +117,10 @@ export const LeaderboardPage = ({
             No resolved polls in this topic yet.
           </div>
         ) : (
-          <div style={{
+          <div className="cs-table-scroll" style={{
             background: 'var(--color-parchment-surface)',
             border: '1px solid var(--color-parchment-line)',
             borderRadius: 4,
-            overflow: 'hidden',
           }}>
             {/* Table header */}
             <div style={{

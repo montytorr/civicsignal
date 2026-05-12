@@ -78,7 +78,7 @@ export const ReputationPage = ({
       <main style={{ padding: '40px 40px 80px', maxWidth: 1180, margin: '0 auto' }}>
 
         {/* Header card */}
-        <div style={{
+        <div className="cs-detail-grid" style={{
           display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 32,
           padding: '32px 36px',
           background: 'var(--color-parchment-surface)',
@@ -132,7 +132,7 @@ export const ReputationPage = ({
           </div>
 
           {/* Right: stats */}
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 0, alignSelf: 'center' }}>
+          <div className="cs-stat-grid" style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 0, alignSelf: 'center' }}>
             {[
               { k: 'Polls resolved', v: totalResolved },
               { k: 'Accuracy',       v: totalResolved > 0 ? `${Math.round(accuracy * 100)}%` : '—' },
@@ -162,7 +162,7 @@ export const ReputationPage = ({
           color: 'var(--color-parchment-muted)',
           fontStyle: 'italic', maxWidth: 700,
         }}>
-          Reputation here is a record of contribution to public intelligence — not a score, a leaderboard, or a wallet. It cannot be traded or transferred.
+          Reputation here is a record of contribution to public intelligence — not a wallet, token, or financial asset. It cannot be traded or transferred.
         </p>
 
         {/* Topic reputation */}
@@ -190,7 +190,7 @@ export const ReputationPage = ({
               No polls resolved yet.
             </div>
           ) : (
-            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: 14 }}>
+            <div className="cs-responsive-grid" style={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: 14 }}>
               {reputation.map((t) => {
                 const rank = getRank(t.score)
                 const topicAccuracy = t.resolved_count > 0 ? t.correct_count / t.resolved_count : 0
@@ -406,7 +406,7 @@ export const ReputationPage = ({
           <div>
             <Eyebrow>Public framing</Eyebrow>
             <p style={{ margin: '10px 0 0', fontSize: 13.5, color: 'var(--color-parchment-ink-soft)', lineHeight: 1.55 }}>
-              Reputation reads as <em>contribution to public intelligence</em>, not <em>profit and loss</em>. There is no portfolio. There are no rankings. There is no leaderboard.
+              Reputation reads as <em>contribution to public intelligence</em>, not <em>profit and loss</em>. Leaderboards compare topic accuracy; they do not create financial value, transferable status, or a portfolio.
             </p>
           </div>
         </section>

@@ -45,6 +45,22 @@
     color: inherit;
     text-decoration: none;
   }
+
+  :focus-visible {
+    outline: 2px solid var(--color-parchment-accent);
+    outline-offset: 2px;
+  }
+}
+
+@layer components {
+  .cs-page-pad {
+    padding-left: 40px;
+    padding-right: 40px;
+  }
+
+  .cs-table-scroll {
+    overflow-x: auto;
+  }
 }
 
 @utility mono {
@@ -63,7 +79,8 @@
     display: none !important;
   }
 
-  .cs-nav-pad {
+  .cs-nav-pad,
+  .cs-page-pad {
     padding-left: 20px !important;
     padding-right: 20px !important;
   }
@@ -78,5 +95,22 @@
 
   .cs-nav-tabs::-webkit-scrollbar {
     display: none;
+  }
+
+  .cs-responsive-grid,
+  .cs-detail-grid,
+  .cs-form-grid,
+  .cs-stat-grid {
+    grid-template-columns: 1fr !important;
+  }
+
+  .cs-stack-mobile {
+    align-items: flex-start !important;
+    flex-direction: column !important;
+    gap: 16px !important;
+  }
+
+  .cs-table-scroll > div {
+    min-width: 720px;
   }
 }
