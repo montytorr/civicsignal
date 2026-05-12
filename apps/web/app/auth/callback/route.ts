@@ -15,9 +15,21 @@ export const GET = async (request: NextRequest) => {
 
       if (user) {
         const serviceClient = createServiceClient()
+        const handle =
+          typeof user.user_metadata?.handle === 'string' && user.user_metadata.handle.length > 0
+            ? user.user_metadata.handle
+            : `civic-${user.id.slice(0, 8)}`
+
         await (serviceClient.from('profiles') as any)
-          .update({ verified: true, verified_at: new Date().toISOString() })
-          .eq('id', user.id)
+          .upsert(
+            {
+              id: user.id,
+              handle,
+              verified: true,
+              verified_at: new Date().toISOString(),
+            },
+            { onConflict: 'id' }
+          )
       }
 
       return NextResponse.redirect(`${origin}/polls`)

@@ -53,25 +53,18 @@ export default function SignUpPage() {
     const supabase = createClient()
     const handle = generateHandle()
 
-    const { data: authData, error: authError } = await supabase.auth.signUp({ email, password })
+    const { error: authError } = await supabase.auth.signUp({
+      email,
+      password,
+      options: {
+        data: { handle },
+      },
+    })
 
     if (authError) {
       setError(authError.message)
       setLoading(false)
       return
-    }
-
-    if (authData.user) {
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      const { error: profileError } = await (supabase as any)
-        .from('profiles')
-        .insert({ id: authData.user.id, handle })
-
-      if (profileError) {
-        setError('Account created but profile setup failed. Please contact support.')
-        setLoading(false)
-        return
-      }
     }
 
     setSuccess(true)
