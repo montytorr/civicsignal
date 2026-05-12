@@ -75,6 +75,23 @@ export const getRecentContributions = async (userId: string) => {
   return data ?? []
 }
 
+export const getPendingVotes = async (userId: string) => {
+  const supabase = await createClient()
+  const { data } = await (supabase.from('votes') as any)
+    .select('id, poll_id, answer, receipt_hash, created_at, polls(question, status, resolves_at, cutoff_at, topics(label))')
+    .eq('user_id', userId)
+    .order('created_at', { ascending: false })
+    .limit(20) as { data: Array<{
+      id: string
+      poll_id: string
+      answer: string | null
+      receipt_hash: string
+      created_at: string
+      polls: { question: string; status: string; resolves_at: string; cutoff_at: string; topics: { label: string } | null } | null
+    }> | null }
+  return data ?? []
+}
+
 export const getTopics = async () => {
   const supabase = await createClient()
   const { data } = await supabase.from('topics').select('*').order('label')

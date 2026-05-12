@@ -50,7 +50,7 @@ export const POST = async (req: Request, { params }: Params) => {
     }
 
     const body = await req.json()
-    const { encryptedAnswer } = body
+    const { encryptedAnswer, answer } = body
 
     if (!encryptedAnswer || typeof encryptedAnswer !== 'string') {
       return NextResponse.json(
@@ -64,9 +64,9 @@ export const POST = async (req: Request, { params }: Params) => {
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const pollsTable = (supabase.from('polls') as any)
     const { data: poll, error: pollError } = await pollsTable
-      .select('id, status, cutoff_at')
+      .select('id, status, cutoff_at, options')
       .eq('id', pollId)
-      .single() as { data: Poll | null; error: { message: string; code?: string } | null }
+      .single() as { data: (Poll & { options: unknown }) | null; error: { message: string; code?: string } | null }
 
     if (pollError || !poll) {
       return NextResponse.json(
@@ -86,6 +86,14 @@ export const POST = async (req: Request, { params }: Params) => {
       return NextResponse.json(
         { success: false, error: 'Poll cutoff has passed', code: 'POLL_CUTOFF_PASSED' },
         { status: 409 }
+      )
+    }
+
+    const options = Array.isArray(poll.options) ? poll.options.map(String) : []
+    if (!answer || typeof answer !== 'string' || !options.includes(answer)) {
+      return NextResponse.json(
+        { success: false, error: 'A valid answer is required', code: 'INVALID_ANSWER' },
+        { status: 400 }
       )
     }
 
@@ -111,6 +119,7 @@ export const POST = async (req: Request, { params }: Params) => {
         poll_id: pollId,
         user_id: user.id,
         encrypted_answer: encryptedAnswer,
+        answer,
         receipt_hash: receipt.hash,
       })
       .select()

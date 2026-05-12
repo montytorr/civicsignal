@@ -1,3 +1,4 @@
+import Link from 'next/link'
 import { Eyebrow, VerifiedBadge, Badge } from '@civicsignal/ui'
 
 type Profile = {
@@ -23,6 +24,21 @@ type ContributionRow = {
   topics?: { label: string } | null
 }
 
+type PendingVoteRow = {
+  id: string
+  poll_id: string
+  answer: string | null
+  receipt_hash: string
+  created_at: string
+  polls?: {
+    question: string
+    status: string
+    resolves_at: string
+    cutoff_at: string
+    topics?: { label: string } | null
+  } | null
+}
+
 const getRank = (score: number) => {
   if (score >= 1500) return 'Steward'
   if (score >= 500) return 'Contributor'
@@ -45,10 +61,12 @@ export const ReputationPage = ({
   profile,
   reputation,
   contributions,
+  pendingVotes,
 }: {
   profile: Profile
   reputation: ReputationRow[]
   contributions: ContributionRow[]
+  pendingVotes: PendingVoteRow[]
 }) => {
   const totalResolved = reputation.reduce((sum, r) => sum + (r.resolved_count ?? 0), 0)
   const totalCorrect = reputation.reduce((sum, r) => sum + (r.correct_count ?? 0), 0)
@@ -252,6 +270,56 @@ export const ReputationPage = ({
                   </div>
                 )
               })}
+            </div>
+          )}
+        </section>
+
+        {/* Pending sealed votes */}
+        <section style={{ marginTop: 40 }}>
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline' }}>
+            <Eyebrow>Pending sealed votes</Eyebrow>
+            <span className="font-mono" style={{ fontSize: 11, color: 'var(--color-parchment-muted)' }}>
+              {pendingVotes.length} active / awaiting resolution
+            </span>
+          </div>
+
+          {pendingVotes.length === 0 ? (
+            <div style={{
+              marginTop: 16, padding: '28px 24px',
+              border: '1px solid var(--color-parchment-line)',
+              borderRadius: 4,
+              background: 'var(--color-parchment-surface)',
+              fontSize: 14,
+              color: 'var(--color-parchment-muted)',
+              textAlign: 'center',
+            }}>
+              No sealed votes yet. Vote on an active poll and it will appear here immediately; reputation points arrive after resolution.
+            </div>
+          ) : (
+            <div style={{
+              marginTop: 16,
+              border: '1px solid var(--color-parchment-line)',
+              borderRadius: 4,
+              background: 'var(--color-parchment-surface)',
+            }}>
+              {pendingVotes.map((row, i) => (
+                <div key={row.id} style={{
+                  display: 'grid', gridTemplateColumns: '1fr auto auto',
+                  gap: 24, alignItems: 'center',
+                  padding: '16px 22px',
+                  borderTop: i > 0 ? '1px solid var(--color-parchment-line-soft)' : 'none',
+                }}>
+                  <Link href={`/polls/${row.poll_id}`} style={{ fontSize: 14, color: 'var(--color-parchment-ink)', textDecoration: 'none', lineHeight: 1.45 }}>
+                    {row.polls?.question ?? row.poll_id}
+                  </Link>
+                  <span className="font-mono" style={{ fontSize: 11, color: 'var(--color-parchment-muted)', letterSpacing: '0.04em', textTransform: 'uppercase' }}>
+                    {row.polls?.topics?.label ?? '—'} · {row.polls?.status ?? 'sealed'}
+                  </span>
+                  <span style={{ fontSize: 13, color: 'var(--color-parchment-ink-soft)', minWidth: 80, textAlign: 'right' }}>
+                    Your vote: <strong style={{ color: 'var(--color-parchment-ink)' }}>{row.answer ?? 'sealed'}</strong>
+                  </span>
+                </div>
+              ))}
             </div>
           )}
         </section>

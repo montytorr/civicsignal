@@ -8,7 +8,10 @@ export const metadata: Metadata = {
     'Public log of every Merkle root published before cutoff. Re-hash and compare to verify no votes were changed after sealing.',
 }
 
-export default async function Page() {
-  const commitments = await getAuditCommitments()
-  return <VerifyPage commitments={commitments} />
+export default async function Page({ searchParams }: { searchParams: Promise<{ receipt?: string }> }) {
+  const [{ receipt }, commitments] = await Promise.all([
+    searchParams,
+    getAuditCommitments(),
+  ])
+  return <VerifyPage commitments={commitments} receiptHash={receipt ?? null} />
 }

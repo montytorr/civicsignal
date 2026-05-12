@@ -12,6 +12,7 @@ type Commitment = {
 
 interface Props {
   commitments: Commitment[]
+  receiptHash?: string | null
 }
 
 const BATCH_TYPE_LABELS: Record<string, string> = {
@@ -26,7 +27,7 @@ const truncateRoot = (root: string) =>
 const formatTs = (iso: string) =>
   new Date(iso).toISOString().replace('T', ' ').slice(0, 16) + ' UTC'
 
-export const VerifyPage = ({ commitments }: Props) => (
+export const VerifyPage = ({ commitments, receiptHash }: Props) => (
   <div style={{ background: 'var(--color-parchment-bg)', color: 'var(--color-parchment-ink)', minHeight: '100%' }}>
 
     {/* HERO BAND */}
@@ -77,6 +78,15 @@ export const VerifyPage = ({ commitments }: Props) => (
 
     {/* COMMITMENTS TABLE */}
     <section style={{ maxWidth: 1280, margin: '0 auto', padding: '48px 40px 96px' }}>
+      {receiptHash && (
+        <div style={{ marginBottom: 24, padding: '18px 22px', background: '#FBF8F1', border: '1px solid #D9D1BD', borderRadius: 4 }}>
+          <Eyebrow>Receipt lookup</Eyebrow>
+          <p style={{ margin: '8px 0 0', fontSize: 13.5, color: '#3A4861', lineHeight: 1.5 }}>
+            Receipt <span className="font-mono" style={{ color: '#0E1F36' }}>{truncateRoot(receiptHash)}</span> is your private vote receipt.
+            It proves what your browser sealed at submission time. It will become publicly auditable once the poll closes and its vote batch Merkle root is published below.
+          </p>
+        </div>
+      )}
       {commitments.length === 0 ? (
         <p style={{ fontSize: 14.5, color: '#6B7488', margin: 0 }}>
           No commitments published yet. They appear here once a poll is sealed.

@@ -8,12 +8,12 @@ import { encryptVoteClient } from '@/lib/encrypt-vote'
 
 interface Props {
   poll: Poll
-  existingVote: { encrypted_answer: string; receipt_hash: string; created_at: string } | null
+  existingVote: { encrypted_answer: string; answer: string | null; receipt_hash: string; created_at: string } | null
   publicKey: string | null
 }
 
 export const PollDetailPage = ({ poll, existingVote, publicKey }: Props) => {
-  const [choice, setChoice] = useState<string | null>(null)
+  const [choice, setChoice] = useState<string | null>(existingVote?.answer ?? null)
   const [submitted, setSubmitted] = useState(!!existingVote)
   const [receipt, setReceipt] = useState<{ hash: string; shortHash: string; timestamp: string } | null>(
     existingVote
@@ -32,7 +32,7 @@ export const PollDetailPage = ({ poll, existingVote, publicKey }: Props) => {
       const res = await fetch(`/api/polls/${poll.id}/vote`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ encryptedAnswer }),
+        body: JSON.stringify({ encryptedAnswer, answer: choice }),
       })
       const json = await res.json()
       if (!res.ok || !json.success) {
@@ -141,6 +141,13 @@ export const PollDetailPage = ({ poll, existingVote, publicKey }: Props) => {
                   <Eyebrow>Receipt · sealed</Eyebrow>
                 </div>
                 <p style={{ margin: '10px 0 0', fontSize: 13.5, color: 'var(--color-parchment-ink-soft)', lineHeight: 1.55 }}>
+                  {choice && (
+                    <>
+                      Your sealed answer is{' '}
+                      <span style={{ color: 'var(--color-parchment-ink)', fontWeight: 600 }}>{choice}</span>.
+                      {' '}
+                    </>
+                  )}
                   Your encrypted answer was committed to the public log
                   {receiptTs && (
                     <>
@@ -162,7 +169,11 @@ export const PollDetailPage = ({ poll, existingVote, publicKey }: Props) => {
                   <Btn kind="ghost" size="sm">
                     <Link href="/polls" style={{ textDecoration: 'none', color: 'inherit' }}>Back to feed</Link>
                   </Btn>
-                  <Btn kind="quiet" size="sm">Verify receipt →</Btn>
+                  <Btn kind="quiet" size="sm">
+                    <Link href={receipt?.hash ? `/verify?receipt=${encodeURIComponent(receipt.hash)}` : '/verify'} style={{ textDecoration: 'none', color: 'inherit' }}>
+                      Verify receipt →
+                    </Link>
+                  </Btn>
                 </div>
               </div>
             ) : (
