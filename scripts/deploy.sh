@@ -20,7 +20,12 @@ corepack pnpm install --frozen-lockfile
 corepack pnpm -r test
 
 # Avoid stale root-owned Next artifacts from manual smoke builds breaking the self-hosted runner.
-rm -rf apps/web/.next
+# The runner has Docker access, so use a throwaway root container to clean artifacts
+# even when a prior manual/root build left files the runner user cannot unlink.
+if [ -d apps/web/.next ]; then
+  docker run --rm -v "$APP_DIR/apps/web/.next:/target" alpine:3.20 sh -c 'rm -rf /target/* /target/.[!.]* /target/..?*'
+  rmdir apps/web/.next 2>/dev/null || true
+fi
 
 ENV_FILE=${ENV_FILE:-/home/runner/civicsignal-secrets/web.env}
 if [ ! -f "$ENV_FILE" ]; then
