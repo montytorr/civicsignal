@@ -240,7 +240,7 @@ export const getOpenDisputes = async () => {
 
   const [evidenceRes, reviewRes] = await Promise.all([
     (supabase as any).from('dispute_evidence').select('*').in('dispute_id', ids).order('created_at').then((r: any) => r).catch(() => ({ data: [] })),
-    (supabase as any).from('dispute_reviews').select('*, profiles(handle)').in('dispute_id', ids).order('created_at').then((r: any) => r).catch(() => ({ data: [] })),
+    (supabase as any).from('dispute_reviews').select('*, profiles!poll_proposals_proposed_by_fkey(handle)').in('dispute_id', ids).order('created_at').then((r: any) => r).catch(() => ({ data: [] })),
   ]) as [
     { data: Array<{ id: string; dispute_id: string; submitted_by: string; summary: string; source_url: string | null; created_at: string }> | null },
     { data: Array<{ id: string; dispute_id: string; reviewer_id: string; decision: string; rationale: string; created_at: string; profiles: { handle: string } | null }> | null },
@@ -256,9 +256,9 @@ export const getOpenDisputes = async () => {
 export const getPanelTransparency = async () => {
   const supabase = await createClient()
   const [members, evidence, reviews] = await Promise.all([
-    (supabase as any).from('panel_members').select('*, topics(label, slug), profiles(handle)').order('invited_at', { ascending: false }).limit(50).then((r: any) => r).catch(() => ({ data: [] })),
+    (supabase as any).from('panel_members').select('*, topics(label, slug), profiles!poll_proposals_proposed_by_fkey(handle)').order('invited_at', { ascending: false }).limit(50).then((r: any) => r).catch(() => ({ data: [] })),
     (supabase as any).from('dispute_evidence').select('*, disputes(poll_id, status, polls(question))').order('created_at', { ascending: false }).limit(50).then((r: any) => r).catch(() => ({ data: [] })),
-    (supabase as any).from('dispute_reviews').select('*, profiles(handle), disputes(poll_id, status, polls(question))').order('created_at', { ascending: false }).limit(50).then((r: any) => r).catch(() => ({ data: [] })),
+    (supabase as any).from('dispute_reviews').select('*, profiles!poll_proposals_proposed_by_fkey(handle), disputes(poll_id, status, polls(question))').order('created_at', { ascending: false }).limit(50).then((r: any) => r).catch(() => ({ data: [] })),
   ])
 
   return {
@@ -357,7 +357,7 @@ export const getMyPanelWorkspace = async () => {
 
   const [evidenceRes, reviewRes] = await Promise.all([
     (supabase as any).from('dispute_evidence').select('*').in('dispute_id', ids).order('created_at').then((r: any) => r).catch(() => ({ data: [] })),
-    (supabase as any).from('dispute_reviews').select('*, profiles(handle)').in('dispute_id', ids).order('created_at').then((r: any) => r).catch(() => ({ data: [] })),
+    (supabase as any).from('dispute_reviews').select('*, profiles!poll_proposals_proposed_by_fkey(handle)').in('dispute_id', ids).order('created_at').then((r: any) => r).catch(() => ({ data: [] })),
   ])
 
   return {
@@ -387,7 +387,7 @@ export const getPollProposals = async (limit = 100) => {
   const supabase = await createClient()
   const { data } = await (supabase as any)
     .from('poll_proposals')
-    .select('*, topics(slug, label), profiles(handle)')
+    .select('*, topics(slug, label), profiles!poll_proposals_proposed_by_fkey(handle)')
     .order('created_at', { ascending: false })
     .limit(limit)
     .then((r: any) => r)
@@ -399,7 +399,7 @@ export const getPendingPollProposals = async () => {
   const supabase = await createClient()
   const { data } = await (supabase as any)
     .from('poll_proposals')
-    .select('*, topics(slug, label), profiles(handle)')
+    .select('*, topics(slug, label), profiles!poll_proposals_proposed_by_fkey(handle)')
     .eq('status', 'pending')
     .order('created_at', { ascending: true })
     .then((r: any) => r)
