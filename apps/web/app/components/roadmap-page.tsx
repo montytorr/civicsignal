@@ -14,10 +14,10 @@ const PHASES = [
       { label: 'Humanity verification v1', done: true },
       { label: 'Poll creation and publishing', done: true },
       { label: 'Sealed vote submission', done: true },
-      { label: 'Single-source resolution', done: false },
-      { label: 'Topic-specific reputation', done: false },
-      { label: 'Signed vote receipts', done: false },
-      { label: 'Public commitment hashes', done: false },
+      { label: 'Single-source resolution', done: true },
+      { label: 'Topic-specific reputation', done: true },
+      { label: 'Signed vote receipts', done: true },
+      { label: 'Public commitment hashes', done: true },
     ],
   },
   {
@@ -106,7 +106,7 @@ export const RoadmapPage = () => (
         }}
       >
         <div>
-          <Eyebrow>Democracy roadmap · v0.4</Eyebrow>
+          <Eyebrow>Democracy roadmap · v0.5</Eyebrow>
           <h1
             style={{
               margin: '14px 0 0',
@@ -274,7 +274,7 @@ export const RoadmapPage = () => (
             only when the previous one has earned trust through real usage and public audit."
           </p>
         </div>
-        <Eyebrow dim>Updated 2026-05-03</Eyebrow>
+        <Eyebrow dim>Updated 2026-05-12</Eyebrow>
       </div>
     </section>
 
