@@ -4,7 +4,7 @@ const PHASES = [
   {
     id: 'signal',
     date: '2026 · Q2',
-    state: 'now' as const,
+    state: 'done' as const,
     title: 'Civic signal',
     subtitle: 'Verified-human polling on real-world events.',
     description:
@@ -23,7 +23,7 @@ const PHASES = [
   {
     id: 'panels',
     date: '2026 · Q3',
-    state: 'now' as const,
+    state: 'done' as const,
     title: 'Trusted panels',
     subtitle: 'Reputation-weighted evidence and review.',
     description:
@@ -37,8 +37,8 @@ const PHASES = [
   },
   {
     id: 'deliberation',
-    date: '2027 · H1',
-    state: 'next' as const,
+    date: '2026 · Q4',
+    state: 'now' as const,
     title: 'Community deliberation',
     subtitle: 'Cross-jurisdiction polls and structured civic questions.',
     description:
@@ -84,11 +84,15 @@ const PHASES = [
   },
 ]
 
-const stateBadge = (state: 'now' | 'next' | 'planned') => {
-  if (state === 'now') return <Badge tone="green" mono>Now</Badge>
+const stateBadge = (state: 'done' | 'now' | 'next' | 'planned') => {
+  if (state === 'done') return <Badge tone="green" mono>Done</Badge>
+  if (state === 'now') return <Badge tone="amber" mono>Now</Badge>
   if (state === 'next') return <Badge tone="amber" mono>Next</Badge>
   return <Badge tone="neutral" mono>Planned</Badge>
 }
+
+const doneCount = (phase: (typeof PHASES)[number]) =>
+  phase.milestones.filter((m) => m.done).length
 
 export const RoadmapPage = () => (
   <div className="bg-parchment-bg text-parchment-ink" style={{ minHeight: '100%' }}>
@@ -106,7 +110,7 @@ export const RoadmapPage = () => (
         }}
       >
         <div>
-          <Eyebrow>Democracy roadmap · v0.6</Eyebrow>
+          <Eyebrow>Democracy roadmap · v0.7</Eyebrow>
           <h1
             style={{
               margin: '14px 0 0',
@@ -132,8 +136,8 @@ export const RoadmapPage = () => (
           }}
         >
           CivicSignal is not a finished product — it is a staged commitment to building civic
-          infrastructure that earns trust over time. Each phase unlocks only after the previous
-          one has proven itself.
+          infrastructure that earns trust over time. Completed phases are marked explicitly;
+          the current build focus is community poll authoring and moderation.
         </p>
       </div>
     </section>
@@ -174,16 +178,21 @@ export const RoadmapPage = () => (
             >
               {phase.title}
             </h2>
-            <p
-              style={{
-                margin: '4px 0 0',
-                fontSize: 14,
-                fontWeight: 500,
-                color: '#3A4861',
-              }}
-            >
-              {phase.subtitle}
-            </p>
+            <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginTop: 4, flexWrap: 'wrap' }}>
+              <p
+                style={{
+                  margin: 0,
+                  fontSize: 14,
+                  fontWeight: 500,
+                  color: '#3A4861',
+                }}
+              >
+                {phase.subtitle}
+              </p>
+              <span className="font-mono" style={{ fontSize: 11, color: '#6B7488', letterSpacing: '0.04em' }}>
+                {doneCount(phase)}/{phase.milestones.length} done
+              </span>
+            </div>
             <p
               style={{
                 marginTop: 16,
@@ -231,9 +240,18 @@ export const RoadmapPage = () => (
                     style={{
                       fontSize: 13.5,
                       color: m.done ? '#0E1F36' : '#3A4861',
+                      flex: 1,
                     }}
                   >
                     {m.label}
+                  </span>
+                  <span className="font-mono" style={{
+                    fontSize: 10.5,
+                    color: m.done ? '#2F6B4A' : '#6B7488',
+                    letterSpacing: '0.05em',
+                    textTransform: 'uppercase',
+                  }}>
+                    {m.done ? 'Done' : phase.state === 'now' ? 'Next' : 'Later'}
                   </span>
                 </div>
               ))}
