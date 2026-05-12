@@ -1,9 +1,11 @@
 import { createServerClient, type CookieOptions } from '@supabase/ssr'
 import { NextResponse, type NextRequest } from 'next/server'
 
-const PROTECTED_PREFIXES = ['/polls', '/admin', '/u']
+const PROTECTED_PREFIXES = ['/admin']
+const PROTECTED_EXACT = ['/u', '/invites']
 
 const isProtected = (pathname: string) =>
+  PROTECTED_EXACT.includes(pathname) ||
   PROTECTED_PREFIXES.some((prefix) => pathname === prefix || pathname.startsWith(prefix + '/'))
 
 /* ------------------------------------------------------------------ */
