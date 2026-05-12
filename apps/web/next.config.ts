@@ -13,6 +13,30 @@ const config: NextConfig = {
   output: 'standalone',
   outputFileTracingRoot: resolve(process.cwd(), '../..'),
   transpilePackages: ['@civicsignal/ui', '@civicsignal/db', '@civicsignal/crypto'],
+  async redirects() {
+    return [
+      {
+        source: '/login',
+        destination: '/auth/signin',
+        permanent: false,
+      },
+      {
+        source: '/signin',
+        destination: '/auth/signin',
+        permanent: false,
+      },
+      {
+        source: '/auth/login',
+        destination: '/auth/signin',
+        permanent: false,
+      },
+      {
+        source: '/auth/sign-in',
+        destination: '/auth/signin',
+        permanent: false,
+      },
+    ]
+  },
   async headers() {
     return [
       {
