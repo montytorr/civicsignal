@@ -1,5 +1,5 @@
 import Link from 'next/link'
-import { Eyebrow } from '@civicsignal/ui'
+import { Eyebrow, Badge } from '@civicsignal/ui'
 
 type Commitment = {
   id: string
@@ -10,9 +10,21 @@ type Commitment = {
   polls: { question: string } | null
 }
 
+interface AuditOverview {
+  proposals: number
+  pendingProposals: number
+  approvedProposals: number
+  disputes: number
+  openDisputes: number
+  reviews: number
+  sealedVotes: number
+  sourceTemplates: number
+}
+
 interface Props {
   commitments: Commitment[]
   receiptHash?: string | null
+  overview: AuditOverview
 }
 
 const BATCH_TYPE_LABELS: Record<string, string> = {
@@ -27,7 +39,7 @@ const truncateRoot = (root: string) =>
 const formatTs = (iso: string) =>
   new Date(iso).toISOString().replace('T', ' ').slice(0, 16) + ' UTC'
 
-export const VerifyPage = ({ commitments, receiptHash }: Props) => (
+export const VerifyPage = ({ commitments, receiptHash, overview }: Props) => (
   <div style={{ background: 'var(--color-parchment-bg)', color: 'var(--color-parchment-ink)', minHeight: '100%' }}>
 
     {/* HERO BAND */}
@@ -69,15 +81,48 @@ export const VerifyPage = ({ commitments, receiptHash }: Props) => (
             textWrap: 'pretty' as never,
           }}
         >
-          Every sealed vote set is hashed into a Merkle root before cutoff. These roots are
-          published here so anyone can verify that no votes were added or changed after sealing.
-          Re-hash the data yourself and compare against the root — they must match.
+          This is the public trust console for CivicSignal. It shows the civic record around proposals, source templates, sealed vote commitments, disputes, panel reviews, and resolution evidence — the parts that should never depend on private assurances.
         </p>
       </div>
     </section>
 
+    {/* TRUST OVERVIEW */}
+    <section style={{ maxWidth: 1280, margin: '0 auto', padding: '34px 40px 0' }}>
+      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: 12 }} className="cs-form-grid">
+        {[
+          { k: 'Proposals', v: overview.proposals, sub: `${overview.pendingProposals} awaiting review` },
+          { k: 'Source templates', v: overview.sourceTemplates, sub: 'Reusable official-source rules' },
+          { k: 'Disputes', v: overview.disputes, sub: `${overview.openDisputes} open or reviewing` },
+          { k: 'Panel reviews', v: overview.reviews, sub: 'Evidence review decisions' },
+        ].map((x) => (
+          <div key={x.k} style={{ background: 'var(--color-parchment-surface)', border: '1px solid var(--color-parchment-line)', borderRadius: 4, padding: '16px 18px' }}>
+            <Eyebrow>{x.k}</Eyebrow>
+            <div className="font-mono" style={{ marginTop: 8, fontSize: 26, color: 'var(--color-parchment-ink)' }}>{x.v.toLocaleString()}</div>
+            <div style={{ marginTop: 4, fontSize: 12.5, color: 'var(--color-parchment-muted)' }}>{x.sub}</div>
+          </div>
+        ))}
+      </div>
+
+      <div style={{ marginTop: 18, display: 'grid', gridTemplateColumns: '1.05fr 0.95fr', gap: 18 }} className="cs-detail-grid">
+        <div style={{ background: 'var(--color-parchment-surface)', border: '1px solid var(--color-parchment-line)', borderRadius: 4, padding: '18px 20px' }}>
+          <Eyebrow>What this proves</Eyebrow>
+          <p style={{ margin: '9px 0 0', fontSize: 13.5, lineHeight: 1.55, color: 'var(--color-parchment-ink-soft)' }}>
+            Commitments prove sealed vote batches existed at a point in time. Proposal and dispute trails prove curation and resolution decisions were not silently rewritten. Source templates make official evidence rules reusable across jurisdictions.
+          </p>
+        </div>
+        <div style={{ background: 'var(--color-parchment-surface)', border: '1px solid var(--color-parchment-line)', borderRadius: 4, padding: '18px 20px' }}>
+          <Eyebrow>Current trust state</Eyebrow>
+          <div style={{ display: 'flex', flexWrap: 'wrap', gap: 8, marginTop: 12 }}>
+            <Badge tone="green" mono>sealed votes: {overview.sealedVotes}</Badge>
+            <Badge tone="green" mono>approved proposals: {overview.approvedProposals}</Badge>
+            <Badge tone="amber" mono>open disputes: {overview.openDisputes}</Badge>
+          </div>
+        </div>
+      </div>
+    </section>
+
     {/* COMMITMENTS TABLE */}
-    <section style={{ maxWidth: 1280, margin: '0 auto', padding: '48px 40px 96px' }}>
+    <section style={{ maxWidth: 1280, margin: '0 auto', padding: '34px 40px 96px' }}>
       {receiptHash && (
         <div style={{ marginBottom: 24, padding: '18px 22px', background: '#FBF8F1', border: '1px solid #D9D1BD', borderRadius: 4 }}>
           <Eyebrow>Receipt lookup</Eyebrow>
@@ -89,7 +134,7 @@ export const VerifyPage = ({ commitments, receiptHash }: Props) => (
       )}
       {commitments.length === 0 ? (
         <p style={{ fontSize: 14.5, color: '#6B7488', margin: 0 }}>
-          No commitments published yet. They appear here once a poll is sealed.
+No vote commitments published yet. Proposal, template, and dispute counts above still show the surrounding trust record while the first public vote batches are forming.
         </p>
       ) : (
         <>

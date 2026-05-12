@@ -1,5 +1,5 @@
 import type { Metadata } from 'next'
-import { getAuditCommitments } from '@/lib/queries'
+import { getAuditCommitments, getAuditOverview } from '@/lib/queries'
 import { VerifyPage } from '@/components/verify-page'
 
 export const metadata: Metadata = {
@@ -9,9 +9,10 @@ export const metadata: Metadata = {
 }
 
 export default async function Page({ searchParams }: { searchParams: Promise<{ receipt?: string }> }) {
-  const [{ receipt }, commitments] = await Promise.all([
+  const [{ receipt }, commitments, overview] = await Promise.all([
     searchParams,
     getAuditCommitments(),
+    getAuditOverview(),
   ])
-  return <VerifyPage commitments={commitments} receiptHash={receipt ?? null} />
+  return <VerifyPage commitments={commitments} receiptHash={receipt ?? null} overview={overview} />
 }

@@ -1,16 +1,54 @@
 # Civic Polling Network
 
-Status: active
-Owner: Cal / Clawdius
+Status: active pre-launch
+Owner: CivicSignal maintainers
 Created: 2026-05-03
 Category: civic-tech
-Private GitHub repo: https://github.com/montytorr/civicsignal
+Repository: https://github.com/montytorr/civicsignal
 
 ## Goal
 
 Build a serious civic-tech platform where verified humans answer topic-specific real-world polls, earn non-transferable reputation only when they are directionally right, and eventually participate in a democracy-native governance layer.
 
 The product should feel credible from day one: not a meme coin, not a prediction casino, not a survey toy. The brand is civic legitimacy, collective intelligence, and democratic accountability.
+
+## Launch readiness
+
+CivicSignal is preparing for an open-source launch. The public posture is:
+
+- **Public-good first** — no wagering, no tradable token, no pay-to-influence mechanics.
+- **Verified-human, pseudonymous by default** — verification protects integrity without forcing public identity disclosure.
+- **Auditable civic record** — votes stay private until cutoff, then resolution and reputation updates are backed by transparent logs and future cryptographic commitments.
+- **Contributor-friendly** — product decisions, poll standards, and trust-model changes should be documented in the same pull request as implementation.
+
+Before opening the repository broadly, keep these files current: `README.md`, `CONTRIBUTING.md`, `docs/`, `.github/ISSUE_TEMPLATE/`, and `.github/pull_request_template.md`.
+
+## Quickstart
+
+```bash
+git clone https://github.com/montytorr/civicsignal.git
+cd civicsignal
+corepack enable
+corepack prepare pnpm@9.15.4 --activate
+pnpm install
+cp .env.example apps/web/.env.local
+pnpm dev
+```
+
+You need a Supabase project for full local development. Use `.env.example` as the variable checklist; never commit real service-role keys or database URLs.
+
+## Repository layout
+
+| Path | Purpose |
+| --- | --- |
+| `apps/web` | Next.js web app and public product surfaces |
+| `packages/ui` | Shared UI components |
+| `packages/db` | Supabase clients, types, and migrations |
+| `packages/crypto` | Vote receipt, hashing, and future commitment utilities |
+| `services/resolver` | Background poll resolution service |
+| `docs` | Product, schema, design, and launch planning docs |
+| `scripts` | Smoke checks and operational helpers |
+
 
 ## Core Thesis
 
@@ -528,4 +566,4 @@ My favorite: CivicSignal. It says what it does without sounding like a DAO from 
 
 ## Current Status
 
-Project plan created. Next step is to pick a working name and turn this into a product spec + MVP schema.
+CivicSignal has an MVP implementation in progress with public product surfaces, proposal moderation, trusted-panel flows, smoke checks, and launch documentation. Keep the roadmap and methodology aligned with shipped behavior before inviting external contributors.

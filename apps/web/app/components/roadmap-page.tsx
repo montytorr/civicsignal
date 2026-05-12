@@ -48,7 +48,9 @@ const PHASES = [
       { label: 'Region-specific resolution sources', done: true },
       { label: 'Structured debate format', done: false },
       { label: 'Cross-jurisdiction aggregation', done: false },
-      { label: 'Locale-aware question templates', done: false },
+      { label: 'Locale-aware question templates', done: true },
+      { label: 'Guided civic-loop demo', done: true },
+      { label: 'Launch seed questions', done: true },
     ],
   },
   {
@@ -63,6 +65,7 @@ const PHASES = [
       { label: 'Reputation-gated governance proposals', done: false },
       { label: 'Community dispute arbitration', done: false },
       { label: 'Source curation governance', done: false },
+      { label: 'Proposal appeal process', done: true },
       { label: 'Rule-change voting', done: false },
     ],
   },
@@ -110,7 +113,7 @@ export const RoadmapPage = () => (
         }}
       >
         <div>
-          <Eyebrow>Democracy roadmap · v0.8</Eyebrow>
+          <Eyebrow>Democracy roadmap · v0.9</Eyebrow>
           <h1
             style={{
               margin: '14px 0 0',
@@ -137,7 +140,7 @@ export const RoadmapPage = () => (
         >
           CivicSignal is not a finished product — it is a staged commitment to building civic
           infrastructure that earns trust over time. Completed phases are marked explicitly;
-          the current build focus is community poll authoring and moderation.
+          the current build focus is guided civic-loop demos, public audit clarity, and launch-quality seed content.
         </p>
       </div>
     </section>

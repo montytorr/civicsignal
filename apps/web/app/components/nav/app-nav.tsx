@@ -10,6 +10,7 @@ import type { User } from '@supabase/supabase-js'
 const BASE_TABS = [
   { label: 'Active polls', href: '/polls' },
   { label: 'Proposals', href: '/proposals' },
+  { label: 'Demo', href: '/demo' },
   { label: 'Methodology', href: '/methodology' },
   { label: 'Roadmap', href: '/roadmap' },
   { label: 'Leaderboard', href: '/leaderboard' },

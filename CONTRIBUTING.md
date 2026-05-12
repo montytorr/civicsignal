@@ -1,6 +1,19 @@
 # Contributing to CivicSignal
 
-Thank you for your interest in contributing. CivicSignal is an open, verifiable civic prediction platform. Contributions of all kinds are welcome — bug reports, feature proposals, documentation, and code.
+Thank you for your interest in contributing. CivicSignal is an open, verifiable civic polling and reputation platform. Contributions of all kinds are welcome — bug reports, feature proposals, documentation, civic poll templates, and code.
+
+CivicSignal is not a betting product, token launch, or partisan campaign tool. Contributions should strengthen verified-human participation, public auditability, clear resolution standards, and democratic legitimacy.
+
+## Before you contribute
+
+Please read the public product docs before proposing a substantial change:
+
+- `README.md` — thesis, architecture, reputation model, and roadmap.
+- `docs/PRODUCT_SPEC.md` — MVP product behavior.
+- `docs/MVP_SCHEMA.md` — database and domain model.
+- `docs/DESIGN_BRIEF.md` — product tone and interface direction.
+
+Open an issue first for changes that affect moderation policy, verification, reputation, vote privacy, resolution, auditability, or public methodology. Small documentation fixes can go straight to a pull request.
 
 ## Getting started
 
@@ -91,7 +104,7 @@ When a feature changes CivicSignal's trust model, update the public surfaces in 
    node scripts/smoke-proposal-lifecycle.mjs
    node scripts/smoke-trusted-panels.mjs
    ```
-4. **Pull request** — open a PR against `main`. Describe what the change does and why.
+5. **Pull request** — open a PR against `main`. Describe what the change does, why it matters, and which public trust surfaces changed.
 
 ## Code style
 
@@ -115,7 +128,23 @@ When a feature changes CivicSignal's trust model, update the public surfaces in 
 
 ## Reporting issues
 
-Open a GitHub Issue. Include steps to reproduce, expected behavior, actual behavior, and your Node/pnpm versions.
+Open a GitHub Issue using the closest template. Include steps to reproduce, expected behavior, actual behavior, and your Node/pnpm versions for bugs.
+
+For poll/source-template proposals, include enough detail for a moderator to decide whether the question is neutral, safe, and publicly resolvable. `docs/EXAMPLE_POLL_PROPOSAL.md` is the recommended format.
+
+## Pull request checklist
+
+Before requesting review, confirm:
+
+- [ ] The change does not introduce wagering, tradable-token, or pay-to-influence mechanics.
+- [ ] Any trust-model change updates public docs or explains why no public docs changed.
+- [ ] Poll/reputation changes preserve pseudonymous-by-default verified-human participation.
+- [ ] New environment variables are added to `.env.example` without real secrets.
+- [ ] Relevant typecheck/build/test/smoke checks were run, or the PR explains why they were not.
+
+## Reporting security issues
+
+Please do not open public issues for vulnerabilities involving authentication, vote privacy, service-role keys, identity verification, or audit-log integrity. Email the maintainers privately instead, then coordinate disclosure after a fix is available.
 
 ## License
 

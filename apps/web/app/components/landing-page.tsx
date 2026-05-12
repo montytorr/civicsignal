@@ -174,8 +174,8 @@ export const LandingPage = ({ polls, stats }: { polls: Poll[]; stats: Stats }) =
           <Link href="/polls">
             <Btn kind="primary" size="lg">Explore active polls</Btn>
           </Link>
-          <Link href="/proposals">
-            <Btn kind="ghost" size="lg">Propose a poll</Btn>
+          <Link href="/demo">
+            <Btn kind="ghost" size="lg">See the civic loop</Btn>
           </Link>
         </div>
 
@@ -367,11 +367,10 @@ export const LandingPage = ({ polls, stats }: { polls: Poll[]; stats: Stats }) =
         <p style={{ margin: 0, fontSize: 14.5, lineHeight: 1.6, color: '#3A4861', maxWidth: 380 }}>
           Polls begin as public proposals or admin drafts, use named resolution sources before cutoff, seal votes until tally, and publish resolution evidence plus dispute review. Anyone can re-run the audit trail.
         </p>
-        <Link href="/methodology">
-          <Btn kind="ghost" size="md" style={{ marginTop: 22 }}>
-            Read the methodology →
-          </Btn>
-        </Link>
+        <div style={{ display: 'flex', gap: 10, marginTop: 22 }}>
+          <Link href="/demo"><Btn kind="primary" size="md">See the demo →</Btn></Link>
+          <Link href="/methodology"><Btn kind="ghost" size="md">Read methodology →</Btn></Link>
+        </div>
       </div>
       <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: 12 }}>
         <MethodCallout label="Community proposals">

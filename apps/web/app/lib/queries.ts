@@ -406,3 +406,26 @@ export const getPendingPollProposals = async () => {
     .catch(() => ({ data: [] }))
   return data ?? []
 }
+
+export const getAuditOverview = async () => {
+  const supabase = await createClient()
+  const [proposals, disputes, reviews, votes, templates] = await Promise.all([
+    (supabase as any).from('poll_proposals').select('status').then((r: any) => r).catch(() => ({ data: [] })),
+    (supabase as any).from('disputes').select('status').then((r: any) => r).catch(() => ({ data: [] })),
+    (supabase as any).from('dispute_reviews').select('id').then((r: any) => r).catch(() => ({ data: [] })),
+    (supabase as any).from('votes').select('id').then((r: any) => r).catch(() => ({ data: [] })),
+    (supabase as any).from('source_templates').select('id').then((r: any) => r).catch(() => ({ data: [] })),
+  ])
+  const proposalRows = proposals.data ?? []
+  const disputeRows = disputes.data ?? []
+  return {
+    proposals: proposalRows.length,
+    pendingProposals: proposalRows.filter((p: any) => ['pending', 'appealed'].includes(p.status)).length,
+    approvedProposals: proposalRows.filter((p: any) => p.status === 'approved').length,
+    disputes: disputeRows.length,
+    openDisputes: disputeRows.filter((d: any) => ['open', 'reviewing'].includes(d.status)).length,
+    reviews: (reviews.data ?? []).length,
+    sealedVotes: (votes.data ?? []).length,
+    sourceTemplates: (templates.data ?? []).length,
+  }
+}
