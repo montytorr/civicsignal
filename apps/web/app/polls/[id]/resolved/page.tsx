@@ -1,4 +1,4 @@
-import { getPollById, getVoteCount } from '@/lib/queries'
+import { getPollById, getVoteCount, getVoteDistribution } from '@/lib/queries'
 import { ResolvedPage } from '@/components/resolved-page'
 import { redirect, notFound } from 'next/navigation'
 
@@ -8,7 +8,7 @@ type Props = {
 
 export default async function Page({ params }: Props) {
   const { id } = await params
-  const [rawPoll, count] = await Promise.all([getPollById(id), getVoteCount(id)])
+  const [rawPoll, count, distribution] = await Promise.all([getPollById(id), getVoteCount(id), getVoteDistribution(id)])
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const dbPoll = rawPoll as any
 
@@ -28,6 +28,7 @@ export default async function Page({ params }: Props) {
       resolvedAt={dbPoll.resolved_at ?? dbPoll.resolves_at}
       outcome={dbPoll.outcome ?? ''}
       options={options}
+      distribution={Object.fromEntries(distribution)}
       participants={count}
       source={dbPoll.source_of_truth}
       sourceUrl={dbPoll.resolution_source_url ?? null}

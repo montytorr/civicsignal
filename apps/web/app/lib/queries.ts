@@ -45,6 +45,34 @@ export const getVoteCount = async (pollId: string) => {
   return count ?? 0
 }
 
+export const getVoteCountsByPoll = async (pollIds: string[]) => {
+  if (pollIds.length === 0) return new Map<string, number>()
+  const supabase = await createClient()
+  const { data } = await (supabase.from('votes') as any)
+    .select('poll_id')
+    .in('poll_id', pollIds) as { data: Array<{ poll_id: string }> | null }
+
+  const counts = new Map<string, number>()
+  pollIds.forEach((id) => counts.set(id, 0))
+  ;(data ?? []).forEach((row) => {
+    counts.set(row.poll_id, (counts.get(row.poll_id) ?? 0) + 1)
+  })
+  return counts
+}
+
+export const getVoteDistribution = async (pollId: string) => {
+  const supabase = await createClient()
+  const { data } = await (supabase.from('votes') as any)
+    .select('answer')
+    .eq('poll_id', pollId) as { data: Array<{ answer: string | null }> | null }
+
+  const counts = new Map<string, number>()
+  ;(data ?? []).forEach((row) => {
+    if (row.answer) counts.set(row.answer, (counts.get(row.answer) ?? 0) + 1)
+  })
+  return counts
+}
+
 export const getUserProfile = async (handle: string) => {
   const supabase = await createClient()
   const { data } = await (supabase.from('profiles') as any)

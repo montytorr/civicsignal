@@ -58,6 +58,7 @@ export const PollDetailPage = ({ poll, existingVote, publicKey }: Props) => {
     : null
   const cutoffLabel = new Date(poll.cutoff).toISOString().replace('T', ' ').slice(0, 16) + ' UTC'
   const resolutionDateLabel = poll.resolves
+  const publicKeyLabel = publicKey ? `${publicKey.slice(0, 10)}…${publicKey.slice(-8)}` : 'Pending publication'
 
   return (
     <div style={{ background: 'var(--color-parchment-bg)', color: 'var(--color-parchment-ink)', minHeight: '100%' }}>
@@ -90,6 +91,20 @@ export const PollDetailPage = ({ poll, existingVote, publicKey }: Props) => {
           {poll.q}
         </h1>
 
+        <div className="cs-responsive-grid" style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: 10, marginTop: 24 }}>
+          {[
+            { label: 'Status', value: poll.status.toUpperCase() },
+            { label: 'Cutoff', value: poll.cutoffLabel },
+            { label: 'Resolves', value: resolutionDateLabel },
+            { label: 'Verified answers', value: poll.participants.toLocaleString() },
+          ].map((item) => (
+            <div key={item.label} style={{ background: 'var(--color-parchment-surface)', border: '1px solid var(--color-parchment-line-soft)', borderRadius: 4, padding: '14px 16px' }}>
+              <div className="font-mono" style={{ fontSize: 10.5, color: 'var(--color-parchment-muted)', letterSpacing: '0.06em', textTransform: 'uppercase' }}>{item.label}</div>
+              <div className="font-mono" style={{ marginTop: 6, fontSize: 17, color: 'var(--color-parchment-ink)', fontVariantNumeric: 'tabular-nums' }}>{item.value}</div>
+            </div>
+          ))}
+        </div>
+
         <section
           className="cs-detail-grid"
           style={{
@@ -104,6 +119,16 @@ export const PollDetailPage = ({ poll, existingVote, publicKey }: Props) => {
             <p style={{ margin: '10px 0 0', fontSize: 14, color: 'var(--color-parchment-ink)', lineHeight: 1.58 }}>
               {poll.resolutionCriteria?.trim() || 'No additional resolution criteria were supplied. The resolver is bound to the named source-of-truth and the published options.'}
             </p>
+            <div style={{ marginTop: 16, paddingTop: 14, borderTop: '1px solid var(--color-parchment-line-soft)', display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 14 }}>
+              <div>
+                <div className="font-mono" style={{ fontSize: 10.5, color: 'var(--color-parchment-muted)', letterSpacing: '0.06em', textTransform: 'uppercase' }}>Bound source</div>
+                <p style={{ margin: '6px 0 0', fontSize: 12.5, color: 'var(--color-parchment-ink-soft)', lineHeight: 1.45 }}>{poll.source}</p>
+              </div>
+              <div>
+                <div className="font-mono" style={{ fontSize: 10.5, color: 'var(--color-parchment-muted)', letterSpacing: '0.06em', textTransform: 'uppercase' }}>Resolution rule</div>
+                <p style={{ margin: '6px 0 0', fontSize: 12.5, color: 'var(--color-parchment-ink-soft)', lineHeight: 1.45 }}>Outcome is assigned to exactly one published option, then reputation is updated.</p>
+              </div>
+            </div>
           </div>
           <div style={{ background: 'var(--color-parchment-surface)', border: '1px solid var(--color-parchment-line)', borderRadius: 4, padding: '20px 22px' }}>
             <Eyebrow>Poll status</Eyebrow>
@@ -340,6 +365,42 @@ export const PollDetailPage = ({ poll, existingVote, publicKey }: Props) => {
             </div>
           </aside>
         </div>
+
+        <section style={{ marginTop: 44 }}>
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline', gap: 20, marginBottom: 14 }}>
+            <Eyebrow>Public record</Eyebrow>
+            <span className="font-mono" style={{ fontSize: 11, color: 'var(--color-parchment-muted)' }}>POLL · {poll.id}</span>
+          </div>
+          <div className="cs-responsive-grid" style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: 12 }}>
+            {[
+              ['01', 'Question published', 'The question, options, source, cutoff, and resolution criteria are visible before voting.'],
+              ['02', 'Votes sealed', 'Verified humans submit one encrypted answer. Counts remain hidden until cutoff.'],
+              ['03', 'Source resolves', 'The resolver checks the named source-of-truth against the locked criteria.'],
+              ['04', 'Audit trail updates', 'Receipt lookup, resolution evidence, and topic reputation become publicly reviewable.'],
+            ].map(([n, title, copy]) => (
+              <div key={n} style={{ background: 'var(--color-parchment-surface)', border: '1px solid var(--color-parchment-line)', borderRadius: 4, padding: '18px 18px 20px' }}>
+                <div className="font-mono" style={{ fontSize: 11, color: 'var(--color-parchment-amber)', letterSpacing: '0.06em' }}>{n}</div>
+                <h3 style={{ margin: '10px 0 0', fontSize: 15, fontWeight: 600, color: 'var(--color-parchment-ink)', letterSpacing: '-0.01em' }}>{title}</h3>
+                <p style={{ margin: '8px 0 0', fontSize: 12.5, color: 'var(--color-parchment-muted)', lineHeight: 1.5 }}>{copy}</p>
+              </div>
+            ))}
+          </div>
+          <div className="cs-detail-grid" style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12, marginTop: 12 }}>
+            <div style={{ background: 'var(--color-parchment-surface)', border: '1px solid var(--color-parchment-line)', borderRadius: 4, padding: '18px 20px' }}>
+              <Eyebrow>Audit identity</Eyebrow>
+              <div style={{ marginTop: 10, display: 'grid', gap: 8, fontSize: 12.5 }}>
+                <div style={{ display: 'flex', justifyContent: 'space-between', gap: 18 }}><span style={{ color: 'var(--color-parchment-muted)' }}>Poll ID</span><span className="font-mono" style={{ color: 'var(--color-parchment-ink)', textAlign: 'right', wordBreak: 'break-all' }}>{poll.id}</span></div>
+                <div style={{ display: 'flex', justifyContent: 'space-between', gap: 18 }}><span style={{ color: 'var(--color-parchment-muted)' }}>Vote public key</span><span className="font-mono" style={{ color: 'var(--color-parchment-ink)', textAlign: 'right' }}>{publicKeyLabel}</span></div>
+              </div>
+            </div>
+            <div style={{ background: 'var(--color-parchment-surface)', border: '1px solid var(--color-parchment-line)', borderRadius: 4, padding: '18px 20px' }}>
+              <Eyebrow>What happens next</Eyebrow>
+              <p style={{ margin: '10px 0 0', fontSize: 13, color: 'var(--color-parchment-ink-soft)', lineHeight: 1.55 }}>
+                After cutoff, CivicSignal keeps the vote set sealed until resolution. When the named source answers the question, the outcome, resolver notes, and audit trail appear on the public resolution record.
+              </p>
+            </div>
+          </div>
+        </section>
       </main>
     </div>
   )

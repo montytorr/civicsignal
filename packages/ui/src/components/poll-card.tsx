@@ -27,6 +27,9 @@ interface PollCardProps {
 
 export const PollCard = ({ poll, href, className }: PollCardProps) => {
   const Tag = href ? 'a' : 'div'
+  const participantLabel = poll.participants === 0
+    ? '0 sealed answers yet'
+    : `${poll.participants.toLocaleString()} sealed ${poll.participants === 1 ? 'answer' : 'answers'}`
 
   return (
     <Tag
@@ -70,7 +73,7 @@ export const PollCard = ({ poll, href, className }: PollCardProps) => {
       <div className="flex items-center justify-between pt-[14px] border-t border-parchment-line-soft">
         <span className="flex items-center gap-[18px] font-mono text-[11.5px] text-parchment-muted">
           <span>CUTOFF · {poll.cutoffLabel}</span>
-          <span>{poll.participants.toLocaleString()} verified humans</span>
+          <span>{participantLabel}</span>
         </span>
         <span className="text-[12px] text-parchment-ink-soft">
           {poll.options.length} options →

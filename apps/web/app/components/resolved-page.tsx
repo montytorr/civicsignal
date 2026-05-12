@@ -10,6 +10,7 @@ interface Props {
   resolvedAt: string
   outcome: string
   options: string[]
+  distribution: Record<string, number>
   participants: number
   source: string
   sourceUrl: string | null
@@ -26,6 +27,7 @@ export const ResolvedPage = ({
   resolvedAt,
   outcome,
   options,
+  distribution,
   participants,
   source,
   sourceUrl,
@@ -100,6 +102,8 @@ export const ResolvedPage = ({
               <div style={{ marginTop: 16, display: 'flex', flexDirection: 'column', gap: 14 }}>
                 {options.map((opt) => {
                   const winner = opt === outcome
+                  const count = distribution[opt] ?? 0
+                  const pct = participants > 0 ? Math.round((count / participants) * 100) : 0
                   return (
                     <div key={opt}>
                       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline', marginBottom: 6 }}>
@@ -118,13 +122,13 @@ export const ResolvedPage = ({
                           className="font-mono"
                           style={{ fontSize: 13, color: 'var(--color-parchment-muted)', fontVariantNumeric: 'tabular-nums' }}
                         >
-                          —
+                          {count.toLocaleString()} · {pct}%
                         </span>
                       </div>
                       <div style={{ height: 4, background: 'var(--color-parchment-surface-alt)', borderRadius: 0, overflow: 'hidden' }}>
                         <div
                           style={{
-                            width: winner ? '100%' : '0%',
+                            width: `${pct}%`,
                             height: '100%',
                             background: winner ? 'var(--color-parchment-green)' : 'var(--color-parchment-ink-soft)',
                           }}
@@ -198,7 +202,7 @@ export const ResolvedPage = ({
                 </p>
                 <p style={{ margin: '4px 0 0', fontSize: 12, color: 'var(--color-parchment-muted)', lineHeight: 1.5 }}>
                   The full sealed-vote set was committed to the public log before cutoff.{' '}
-                  <a href="#" style={{ color: 'var(--color-parchment-accent)', textDecoration: 'none' }}>Verify →</a>
+                  <Link href={`/verify?poll=${encodeURIComponent(id)}`} style={{ color: 'var(--color-parchment-accent)', textDecoration: 'none' }}>Verify →</Link>
                 </p>
               </div>
             )}

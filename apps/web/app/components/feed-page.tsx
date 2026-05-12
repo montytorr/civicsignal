@@ -55,11 +55,11 @@ export const FeedPage = ({ polls, topics }: Props) => {
         </p>
 
         {/* Filter row */}
-        <div style={{ display: 'flex', alignItems: 'center', gap: 16, padding: '14px 0', borderBottom: '1px solid var(--color-parchment-line)', marginBottom: 24 }}>
+        <div className="cs-stack-mobile" style={{ display: 'flex', alignItems: 'center', gap: 16, padding: '14px 0', borderBottom: '1px solid var(--color-parchment-line)', marginBottom: 12 }}>
           <Eyebrow>Filter</Eyebrow>
 
           {/* Topic pills */}
-          <div style={{ display: 'flex', gap: 4, flexWrap: 'nowrap', whiteSpace: 'nowrap' }}>
+          <div style={{ display: 'flex', gap: 4, flexWrap: 'wrap', whiteSpace: 'nowrap' }}>
             {allTopics.map((t) => {
               const active = t === topic
               return (
@@ -132,6 +132,10 @@ export const FeedPage = ({ polls, topics }: Props) => {
           </div>
         </div>
 
+        <div className="font-mono" style={{ fontSize: 11, color: 'var(--color-parchment-muted)', letterSpacing: '0.04em', textTransform: 'uppercase', marginBottom: 16 }}>
+          {topic} · {region} · {sort} first
+        </div>
+
         {/* Poll grid */}
         {filtered.length === 0 ? (
           <div style={{
@@ -144,6 +148,9 @@ export const FeedPage = ({ polls, topics }: Props) => {
             color: 'var(--color-parchment-muted)',
           }}>
             <div>No active polls match those filters.</div>
+            <div style={{ marginTop: 8, fontSize: 13, color: 'var(--color-parchment-ink-soft)' }}>
+              Try the archive, read the methodology, or reset the filter stack.
+            </div>
             <button
               onClick={() => { setTopic('All'); setRegion('All regions'); setSort('Cutoff') }}
               className="font-mono"
