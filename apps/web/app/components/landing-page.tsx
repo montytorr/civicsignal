@@ -242,7 +242,7 @@ export const LandingPage = ({ polls, stats }: { polls: Poll[]; stats: Stats }) =
         style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline', marginBottom: 48 }}
       >
         <Eyebrow>How it works</Eyebrow>
-        <span className="font-mono" style={{ fontSize: 11, color: '#6B7488' }}>01 / 05</span>
+        <span className="font-mono" style={{ fontSize: 11, color: '#6B7488' }}>01 / 04</span>
       </div>
       <div
         style={{
