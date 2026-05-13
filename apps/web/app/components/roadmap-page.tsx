@@ -150,6 +150,7 @@ export const RoadmapPage = () => (
       {PHASES.map((phase, i) => (
         <div
           key={phase.id}
+          id={phase.id}
           style={{
             display: 'grid',
             gridTemplateColumns: '180px 1fr',
