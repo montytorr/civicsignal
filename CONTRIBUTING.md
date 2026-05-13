@@ -12,6 +12,7 @@ Please read the public product docs before proposing a substantial change:
 - `docs/PRODUCT_SPEC.md` — MVP product behavior.
 - `docs/MVP_SCHEMA.md` — database and domain model.
 - `docs/DESIGN_BRIEF.md` — product tone and interface direction.
+- `CODE_OF_CONDUCT.md` and `GOVERNANCE.md` — contributor behavior and beta decision policy.
 
 Open an issue first for changes that affect moderation policy, verification, reputation, vote privacy, resolution, auditability, or public methodology. Small documentation fixes can go straight to a pull request.
 
@@ -144,7 +145,7 @@ Before requesting review, confirm:
 
 ## Reporting security issues
 
-Please do not open public issues for vulnerabilities involving authentication, vote privacy, service-role keys, identity verification, or audit-log integrity. Email the maintainers privately instead, then coordinate disclosure after a fix is available.
+Please do not open public issues for vulnerabilities involving authentication, vote privacy, service-role keys, identity verification, or audit-log integrity. Use GitHub private vulnerability reporting when available, or email cal@dispofi.fr with the subject prefix `[CivicSignal Security]`, then coordinate disclosure after a fix is available.
 
 ## License
 

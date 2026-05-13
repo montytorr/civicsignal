@@ -129,7 +129,7 @@ export const getTopics = async () => {
 export const getPlatformStats = async () => {
   const supabase = await createClient()
   const [users, polls, regions] = await Promise.all([
-    supabase.from('profiles').select('*', { count: 'exact', head: true }),
+    supabase.from('profiles').select('*', { count: 'exact', head: true }).eq('verified', true),
     supabase.from('polls').select('*', { count: 'exact', head: true }).eq('status', 'resolved'),
     supabase.from('polls').select('region').in('status', ['active', 'closed', 'resolved']),
   ])

@@ -1,6 +1,6 @@
 # CivicSignal MVP Schema & Reputation Model
 
-Status: draft v0.1
+Status: implemented baseline / migration-backed v0.7
 Created: 2026-05-03
 
 ## Design Principles

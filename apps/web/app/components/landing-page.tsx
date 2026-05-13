@@ -255,8 +255,8 @@ export const LandingPage = ({ polls, stats }: { polls: Poll[]; stats: Stats }) =
         {[
           {
             n: '01',
-            h: 'Verified humans, not crowds.',
-            d: 'Each participant clears a privacy-preserving humanity check before voting. We never see who you are; the network only sees that you are exactly one person.',
+            h: 'Verified beta participants, not anonymous drive-bys.',
+            d: 'Participants need a verified profile before voting. Today that means account, email, invite/profile, rate-limit, and abuse controls; stronger proof-of-personhood can layer in later.',
           },
           {
             n: '02',

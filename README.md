@@ -550,16 +550,19 @@ My favorite: CivicSignal. It says what it does without sounding like a DAO from 
 
 ## Immediate TODO
 
-- [ ] Choose working name.
-- [ ] Decide first beta domain: world events vs local/EU civic.
-- [ ] Draft poll schema and reputation formula.
-- [ ] Create product spec from this project file.
-- [ ] Build landing page prototype.
-- [ ] Build database schema.
-- [ ] Build MVP voting flow.
-- [ ] Add verification v1.
-- [ ] Add admin resolution flow.
-- [ ] Add public methodology page.
+- [x] Choose working name: CivicSignal.
+- [x] Decide first beta domain: global civic/world events.
+- [x] Draft poll schema and reputation formula.
+- [x] Create product spec from this project file.
+- [x] Build landing page and public product surfaces.
+- [x] Build database schema and Supabase migrations.
+- [x] Build MVP voting flow with sealed active vote splits.
+- [x] Add verification v1 through Supabase auth, profiles, rate limits, and invite/onboarding flows.
+- [x] Add admin creation, publication, proposal moderation, resolution, and dispute review flows.
+- [x] Add public methodology, roadmap, audit, panels, proposal, archive, and leaderboard pages.
+- [x] Seed 25-50 serious launch polls.
+- [x] Add proposal lifecycle and trusted-panel smoke checks.
+- [ ] Run first external beta cohort and publish the first weekly public signal report.
 
 ## Decision Log
 
@@ -578,4 +581,4 @@ My favorite: CivicSignal. It says what it does without sounding like a DAO from 
 
 ## Current Status
 
-CivicSignal has an MVP implementation in progress with public product surfaces, proposal moderation, trusted-panel flows, smoke checks, and launch documentation. Keep the roadmap and methodology aligned with shipped behavior before inviting external contributors.
+CivicSignal is in credible pre-launch/beta-readiness mode: the MVP app, public trust surfaces, proposal governance, signed receipts/audit commitments, seeded polls, admin flows, and Trusted Panels path are live. The remaining work is operational launch discipline: keep QA/smoke checks clean, invite the first external cohort, moderate real proposals, and publish the first weekly public signal report.

@@ -1,6 +1,6 @@
 # CivicSignal Product Spec — MVP
 
-Status: draft v0.1
+Status: implemented MVP / beta hardening v0.7
 Created: 2026-05-03
 
 ## Product Promise

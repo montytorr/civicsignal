@@ -5,3 +5,6 @@
 - [MVP Schema](./MVP_SCHEMA.md) — draft data model, reputation formula, API surface, and required tests.
 - [Design Brief](./DESIGN_BRIEF.md) — product/design direction, visual principles, core screens, and UX constraints.
 - [Example Poll Proposal](./EXAMPLE_POLL_PROPOSAL.md) — recommended format for neutral, publicly resolvable civic poll proposals.
+- [Launch QA](./LAUNCH_QA.md) — release gates, smoke checks, route checks, and first beta operating loop.
+- [Governance](../GOVERNANCE.md) — beta maintainer policy, poll governance, Trusted Panels, and future governance path.
+- [Code of Conduct](../CODE_OF_CONDUCT.md) — contributor behavior standards and enforcement posture.

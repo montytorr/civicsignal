@@ -1,6 +1,6 @@
 # Security Policy
 
-CivicSignal handles vote privacy, pseudonymous verification, moderation state, service-role credentials, and future audit commitments. Please report sensitive security issues privately rather than opening a public GitHub issue.
+CivicSignal handles vote privacy, pseudonymous verification, moderation state, service-role credentials, and future audit commitments. Please report sensitive security issues privately rather than opening a public GitHub issue. Use GitHub private vulnerability reporting when available, or email cal@dispofi.fr with the subject prefix `[CivicSignal Security]`.
 
 ## Please report privately
 

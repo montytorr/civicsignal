@@ -33,6 +33,7 @@ const cleanup = async () => {
   }
   if (pollId) {
     try { await req(`/rest/v1/votes?poll_id=eq.${pollId}`, { method: 'DELETE', prefer: 'return=minimal' }) } catch {}
+    try { await req(`/rest/v1/reputation_events?poll_id=eq.${pollId}`, { method: 'DELETE', prefer: 'return=minimal' }) } catch {}
     try { await req(`/rest/v1/audit_commitments?poll_id=eq.${pollId}`, { method: 'DELETE', prefer: 'return=minimal' }) } catch {}
     try { await req(`/rest/v1/poll_proposals?poll_id=eq.${pollId}`, { method: 'PATCH', prefer: 'return=minimal', body: JSON.stringify({ poll_id: null }) }) } catch {}
     try { await req(`/rest/v1/polls?id=eq.${pollId}`, { method: 'DELETE', prefer: 'return=minimal' }) } catch {}

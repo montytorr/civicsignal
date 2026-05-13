@@ -4,16 +4,16 @@ const PHASES = [
   {
     id: 'signal',
     date: '2026 · Q2',
-    state: 'done' as const,
+    state: 'beta' as const,
     title: 'Civic signal',
     subtitle: 'Verified-human polling on real-world events.',
     description:
-      'Users answer real-world civic polls and build topic reputation. Each participant clears a privacy-preserving humanity check. Votes are sealed until cutoff, then resolved against a named source-of-truth.',
+      'Users answer real-world civic polls and build topic reputation. Each participant clears beta verification checks. Active vote splits are hidden publicly until cutoff, then resolved against a named source-of-truth.',
     milestones: [
       { label: 'Pseudonymous handle generation', done: true },
-      { label: 'Humanity verification v1', done: true },
+      { label: 'Beta verification gate', done: true },
       { label: 'Poll creation and publishing', done: true },
-      { label: 'Sealed vote submission', done: true },
+      { label: 'Publicly hidden active vote splits', done: true },
       { label: 'Single-source resolution', done: true },
       { label: 'Topic-specific reputation', done: true },
       { label: 'Signed vote receipts', done: true },
@@ -23,7 +23,7 @@ const PHASES = [
   {
     id: 'panels',
     date: '2026 · Q3',
-    state: 'done' as const,
+    state: 'beta' as const,
     title: 'Trusted panels',
     subtitle: 'Reputation-weighted evidence and review.',
     description:
@@ -32,7 +32,7 @@ const PHASES = [
       { label: 'Reputation-gated panel invitations', done: true },
       { label: 'Evidence submission workflow', done: true },
       { label: 'Multi-resolver dispute review', done: true },
-      { label: 'Panel transparency reports', done: true },
+      { label: 'Panel transparency surface', done: true },
     ],
   },
   {
@@ -87,8 +87,9 @@ const PHASES = [
   },
 ]
 
-const stateBadge = (state: 'done' | 'now' | 'next' | 'planned') => {
+const stateBadge = (state: 'done' | 'beta' | 'now' | 'next' | 'planned') => {
   if (state === 'done') return <Badge tone="green" mono>Done</Badge>
+  if (state === 'beta') return <Badge tone="green" mono>Beta</Badge>
   if (state === 'now') return <Badge tone="amber" mono>Now</Badge>
   if (state === 'next') return <Badge tone="amber" mono>Next</Badge>
   return <Badge tone="neutral" mono>Planned</Badge>
@@ -113,7 +114,7 @@ export const RoadmapPage = () => (
         }}
       >
         <div>
-          <Eyebrow>Democracy roadmap · v0.9</Eyebrow>
+          <Eyebrow>Democracy roadmap · v1.0 beta</Eyebrow>
           <h1
             style={{
               margin: '14px 0 0',
@@ -139,8 +140,8 @@ export const RoadmapPage = () => (
           }}
         >
           CivicSignal is not a finished product — it is a staged commitment to building civic
-          infrastructure that earns trust over time. Completed phases are marked explicitly;
-          the current build focus is guided civic-loop demos, public audit clarity, and launch-quality seed content.
+          infrastructure that earns trust over time. Beta-complete phases are marked explicitly;
+          the current build focus is external beta operations, public audit clarity, and the first weekly signal report.
         </p>
       </div>
     </section>
@@ -254,7 +255,7 @@ export const RoadmapPage = () => (
                     letterSpacing: '0.05em',
                     textTransform: 'uppercase',
                   }}>
-                    {m.done ? 'Done' : phase.state === 'now' ? 'Next' : 'Later'}
+                    {m.done ? (phase.state === 'beta' ? 'Beta' : 'Done') : phase.state === 'now' ? 'Next' : 'Later'}
                   </span>
                 </div>
               ))}

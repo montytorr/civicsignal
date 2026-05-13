@@ -7,7 +7,6 @@ const PLATFORM_LINKS = [
   { label: 'Demo', href: '/demo' },
   { label: 'Methodology', href: '/methodology' },
   { label: 'Roadmap', href: '/roadmap' },
-  { label: 'Admin', href: '/admin' },
 ]
 
 const PROJECT_LINKS = [
@@ -15,7 +14,6 @@ const PROJECT_LINKS = [
   { label: 'Leaderboard', href: '/leaderboard' },
   { label: 'Trusted panels', href: '/panels' },
   { label: 'Archive', href: '/archive' },
-  { label: 'Invites', href: '/invites' },
 ]
 
 const OPEN_LINKS = [
@@ -23,6 +21,7 @@ const OPEN_LINKS = [
   { label: 'Public audit', href: '/verify' },
   { label: 'License (MPL-2.0)', href: 'https://github.com/montytorr/civicsignal/blob/main/LICENSE', external: true },
   { label: 'Contributing', href: 'https://github.com/montytorr/civicsignal/blob/main/CONTRIBUTING.md', external: true },
+  { label: 'Security', href: 'https://github.com/montytorr/civicsignal/blob/main/SECURITY.md', external: true },
 ]
 
 const FooterLink = ({

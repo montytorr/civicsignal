@@ -6,35 +6,35 @@ const SECTIONS = [
     id: 'humans',
     n: '01',
     h: 'Verified humans',
-    d: 'Each participant completes a privacy-preserving humanity check the first time they sign in. The check returns a one-bit answer — “this is exactly one human” — and nothing else. We never store or learn who you are.',
+    d: 'Beta participation starts with account, email, invite/profile, rate-limit, and abuse controls. Stronger proof-of-personhood providers can be added without changing the public reputation model.',
     bullets: [
-      'No phone numbers retained',
-      'No biometric data retained',
-      'No social account required',
-      'Verifier rotation every 90 days',
+      'Email and invite/profile checks',
+      'Verified profile required to vote',
+      'Rate-limited sensitive actions',
+      'Stronger providers planned',
     ],
   },
   {
     id: 'pseudo',
     n: '02',
     h: 'Pseudonymity by default',
-    d: 'Every account is assigned a stable, randomly-generated handle. Names, emails, and identifying metadata never leave the verification step. Your handle is the only public part of you.',
+    d: 'Every account receives a stable public handle. Email and account metadata stay in the authentication layer; the public product is built around handles, topic reputation, proposals, votes, and disputes.',
     bullets: [
-      'Random pronounceable handles',
-      'No real-name display ever',
+      'Stable public handles',
+      'No real-name requirement',
       'No location display by default',
-      'Cross-poll history is opt-in',
+      'Public reputation is topic-scoped',
     ],
   },
   {
     id: 'sealed',
     n: '03',
     h: 'Sealed votes',
-    d: 'When you answer, your vote is encrypted client-side and sealed until cutoff. We publish a hash of the full vote set before cutoff so the entire population is committed before any tally exists.',
+    d: 'When you answer, the active public feed keeps aggregate results hidden until cutoff. The beta stores an encrypted answer, a validated answer for resolution/reputation, and a receipt hash so the workflow can be audited while stronger end-to-end sealing matures.',
     bullets: [
-      'Client-side encryption',
-      'Pre-cutoff commitment hash',
-      'No partial reveals to staff',
+      'Active vote split hidden publicly',
+      'Encrypted answer plus receipt hash',
+      'One vote per verified user per poll',
       'No vote reweighting',
     ],
   },
@@ -90,12 +90,12 @@ const SECTIONS = [
     id: 'audit',
     n: '08',
     h: 'Open audit',
-    d: 'All commitments, resolutions, and reputation events are mirrored to a public log. The auditor CLI re-runs the entire history end-to-end against the log and prints a single fingerprint.',
+    d: 'The public audit console exposes proposal counts, source-template coverage, disputes, panel reviews, vote commitments, and resolution evidence. A standalone export/verifier CLI is planned after beta data stabilizes.',
     bullets: [
-      'MPL-2.0 reference impl',
-      'Public commitment mirror',
-      'One-line auditor CLI',
-      'Fingerprint published weekly',
+      'MPL-2.0 reference implementation',
+      'Public audit console live',
+      'Commitment rows visible',
+      'Verifier export planned',
     ],
   },
 ]
@@ -117,7 +117,7 @@ export const MethodPage = () => (
         }}
       >
       <div>
-        <Eyebrow>Methodology · v0.8</Eyebrow>
+        <Eyebrow>Methodology · v0.9 beta</Eyebrow>
         <h1
           style={{
             margin: '14px 0 0',
@@ -142,9 +142,8 @@ export const MethodPage = () => (
           textWrap: 'pretty' as never,
         }}
       >
-        Trust is not a feeling we ask you for — it is the property of a system you can audit.
-        This page describes how every part of CivicSignal is built so that no single party,
-        including us, can tilt an outcome, curate questions, or resolve disputes without leaving evidence behind.
+        Trust is not a feeling we ask you for — it is the property of a system you can inspect.
+        This page separates what is live in beta from the stronger verification and audit layers still planned, so CivicSignal earns credibility without pretending the hard parts are already finished.
       </p>
       </div>
     </section>
