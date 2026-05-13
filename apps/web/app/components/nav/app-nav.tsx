@@ -20,6 +20,7 @@ const SECONDARY_TABS = [
   { label: 'Archive', href: '/archive' },
   { label: 'Leaderboard', href: '/leaderboard' },
   { label: 'Public audit', href: '/verify' },
+  { label: 'Reports', href: '/reports' },
 ]
 
 export const AppNav = () => {

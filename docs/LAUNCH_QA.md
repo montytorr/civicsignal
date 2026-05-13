@@ -3,6 +3,24 @@
 Status: active checklist  
 Last updated: 2026-05-13
 
+## Latest gate run — 2026-05-13 UTC
+
+Result: **pass**
+
+- `corepack pnpm -r test` — passed (crypto 33 tests, web 48 tests)
+- `corepack pnpm --filter @civicsignal/web typecheck` — passed
+- `corepack pnpm --filter @civicsignal/web build` — passed
+- `node scripts/smoke-proposal-lifecycle.mjs` — `SMOKE_OK proposal-lifecycle`
+- `node scripts/smoke-trusted-panels.mjs` — `SMOKE_OK trusted-panels`
+
+Follow-up shipped from this pass:
+
+- `/reports` now provides the first weekly signal report format and live beta counters.
+- `/verify` now links a machine-readable `/api/audit/export` JSON snapshot.
+- `/invites` now frames invites as an early-cohort operating loop rather than just code generation.
+- Header/footer navigation now exposes signal reports and audit export.
+- Production poll inventory checked: 43 active polls, 0 weak source/criteria rows, 0 synthetic lifecycle polls.
+
 This checklist is the minimum bar before inviting a wider public beta cohort. CivicSignal is a trust product; broken trust flows are launch blockers, not cosmetic bugs.
 
 ## Required gates

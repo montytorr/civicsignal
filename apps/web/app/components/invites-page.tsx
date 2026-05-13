@@ -59,12 +59,12 @@ export const InvitesPage = ({ initialInvites }: { initialInvites: Invite[] }) =>
         {/* Header */}
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline', marginBottom: 8 }}>
           <div>
-            <Eyebrow>Invite system</Eyebrow>
+            <Eyebrow>Beta operations</Eyebrow>
             <h1 style={{
               margin: '8px 0 0', fontSize: 36, fontWeight: 500,
               letterSpacing: '-0.02em', color: 'var(--color-parchment-ink)',
             }}>
-              Your invite codes
+              Beta cohort invites
             </h1>
           </div>
           <div className="font-mono" style={{ textAlign: 'right' }}>
@@ -79,8 +79,22 @@ export const InvitesPage = ({ initialInvites }: { initialInvites: Invite[] }) =>
         </div>
 
         <p style={{ marginTop: 8, fontSize: 14, color: 'var(--color-parchment-ink-soft)', maxWidth: 560 }}>
-          Share these links with people you trust. Each code can be used once. You may hold up to {MAX_ACTIVE_INVITES} unused codes at a time.
+          Use this as the early-cohort control loop: invite people you trust to test the civic workflow, then watch which codes convert. Each link can be used once; you may hold up to {MAX_ACTIVE_INVITES} unused codes at a time.
         </p>
+
+
+        <div style={{ marginTop: 22, display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 12 }} className="cs-form-grid">
+          {[
+            { k: 'Who to invite', v: 'People who will vote carefully, submit one proposal, and report friction.' },
+            { k: 'What to ask', v: 'One vote, one proposal review, one honest bug or trust concern.' },
+            { k: 'When to expand', v: 'After smoke tests stay clean and the first signal report has real activity.' },
+          ].map((item) => (
+            <div key={item.k} style={{ background: 'var(--color-parchment-surface)', border: '1px solid var(--color-parchment-line)', borderRadius: 4, padding: '15px 16px' }}>
+              <Eyebrow>{item.k}</Eyebrow>
+              <p style={{ margin: '8px 0 0', fontSize: 12.8, lineHeight: 1.48, color: 'var(--color-parchment-ink-soft)' }}>{item.v}</p>
+            </div>
+          ))}
+        </div>
 
         {/* Generate button + error */}
         <div style={{ marginTop: 24, display: 'flex', alignItems: 'center', gap: 16 }}>
@@ -229,7 +243,7 @@ export const InvitesPage = ({ initialInvites }: { initialInvites: Invite[] }) =>
 
         {/* Footer note */}
         <p style={{ marginTop: 32, fontSize: 12.5, color: 'var(--color-parchment-muted)', fontStyle: 'italic', maxWidth: 560 }}>
-          Invite links include a pre-filled code. The recipient must verify their identity during signup — the code alone does not bypass verification.
+          Invite links include a pre-filled code. The recipient still has to create an account and pass the configured verification path — an invite is access control, not proof-of-personhood.
         </p>
       </main>
     </div>

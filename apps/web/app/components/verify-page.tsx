@@ -119,6 +119,18 @@ export const VerifyPage = ({ commitments, receiptHash, overview }: Props) => (
           </div>
         </div>
       </div>
+
+      <div style={{ marginTop: 18, background: '#FBF8F1', border: '1px solid var(--color-parchment-line)', borderRadius: 4, padding: '18px 20px', display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: 18 }}>
+        <div>
+          <Eyebrow>Machine-readable export</Eyebrow>
+          <p style={{ margin: '8px 0 0', fontSize: 13.5, lineHeight: 1.5, color: 'var(--color-parchment-ink-soft)' }}>
+            Download the current public audit snapshot as JSON: commitments, proposal trail, source templates, dispute status, and aggregate counts.
+          </p>
+        </div>
+        <Link href="/api/audit/export" style={{ fontSize: 13, color: 'var(--color-parchment-ink)', textDecoration: 'none', border: '1px solid var(--color-parchment-line)', borderRadius: 3, padding: '9px 13px', whiteSpace: 'nowrap' }}>
+          Export JSON →
+        </Link>
+      </div>
     </section>
 
     {/* COMMITMENTS TABLE */}

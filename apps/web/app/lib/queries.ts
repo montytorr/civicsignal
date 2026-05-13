@@ -429,3 +429,42 @@ export const getAuditOverview = async () => {
     sourceTemplates: (templates.data ?? []).length,
   }
 }
+
+export const getLaunchSignalReport = async () => {
+  const supabase = await createClient()
+  const [polls, votes, proposals, disputes, reviews] = await Promise.all([
+    (supabase as any).from('polls').select('status, question, source_of_truth, resolution_criteria, region, cutoff_at, resolves_at').then((r: any) => r).catch(() => ({ data: [] })),
+    (supabase as any).from('votes').select('id').then((r: any) => r).catch(() => ({ data: [] })),
+    (supabase as any).from('poll_proposals').select('status').then((r: any) => r).catch(() => ({ data: [] })),
+    (supabase as any).from('disputes').select('status').then((r: any) => r).catch(() => ({ data: [] })),
+    (supabase as any).from('dispute_reviews').select('id').then((r: any) => r).catch(() => ({ data: [] })),
+  ])
+
+  const pollRows = polls.data ?? []
+  const proposalRows = proposals.data ?? []
+  const disputeRows = disputes.data ?? []
+
+  const weakPolls = pollRows
+    .filter((p: any) => !p.source_of_truth || !p.resolution_criteria || String(p.resolution_criteria).length < 80)
+    .slice(0, 3)
+    .map((p: any) => `Tighten resolution criteria: ${p.question}`)
+
+  const watchlist = [
+    ...(weakPolls.length ? weakPolls : ['No obvious missing source/criteria fields in current poll inventory.']),
+    'Before external beta, spot-check seed questions for named official sources and explicit “what does not count” language.',
+    'First weekly report should include actual cohort size once invites are issued and accepted.',
+  ]
+
+  return {
+    generatedAt: new Date().toISOString(),
+    activePolls: pollRows.filter((p: any) => p.status === 'active').length,
+    resolvedPolls: pollRows.filter((p: any) => p.status === 'resolved').length,
+    votes: (votes.data ?? []).length,
+    proposals: proposalRows.length,
+    pendingProposals: proposalRows.filter((p: any) => ['pending', 'appealed'].includes(p.status)).length,
+    disputes: disputeRows.length,
+    openDisputes: disputeRows.filter((d: any) => ['open', 'reviewing'].includes(d.status)).length,
+    panelReviews: (reviews.data ?? []).length,
+    watchlist,
+  }
+}
