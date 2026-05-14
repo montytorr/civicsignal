@@ -21,6 +21,7 @@ export default async function Page() {
     { k: 'Resolved polls', v: report.resolvedPolls, sub: 'with outcomes recorded' },
     { k: 'Votes', v: report.votes, sub: 'sealed receipts created' },
     { k: 'Proposals', v: report.proposals, sub: `${report.pendingProposals} pending or appealed` },
+    { k: 'Beta invites', v: report.invitesIssued, sub: `${report.invitesAccepted} accepted · ${report.invitesOpen} open` },
     { k: 'Disputes', v: report.disputes, sub: `${report.openDisputes} open or reviewing` },
     { k: 'Panel reviews', v: report.panelReviews, sub: 'evidence decisions' },
   ]
@@ -46,7 +47,7 @@ export default async function Page() {
           </div>
         </section>
 
-        <section style={{ marginTop: 30, display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 12 }} className="cs-form-grid">
+        <section style={{ marginTop: 30, display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: 12 }} className="cs-form-grid">
           {metrics.map((m) => (
             <div key={m.k} style={{ background: 'var(--color-parchment-surface)', border: '1px solid var(--color-parchment-line)', borderRadius: 4, padding: '17px 18px' }}>
               <Eyebrow>{m.k}</Eyebrow>
@@ -83,7 +84,7 @@ export default async function Page() {
           <div>
             <Eyebrow>Next report trigger</Eyebrow>
             <p style={{ margin: '8px 0 0', fontSize: 14, lineHeight: 1.5, color: 'var(--color-parchment-ink-soft)' }}>
-              Publish the first real report after the first external cohort casts votes or submits proposals. Until then, this page is the format and baseline.
+              Publish the first real report after the first external cohort casts votes or submits proposals. Until then, this page tracks the invite funnel, operating metrics, and quality baseline.
             </p>
           </div>
           <div style={{ display: 'flex', gap: 10, flexShrink: 0 }}>

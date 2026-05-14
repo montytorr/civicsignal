@@ -3,7 +3,7 @@
 Status: active checklist  
 Last updated: 2026-05-13
 
-## Latest gate run — 2026-05-13 UTC
+## Latest gate run — 2026-05-14 UTC
 
 Result: **pass**
 
@@ -12,14 +12,15 @@ Result: **pass**
 - `corepack pnpm --filter @civicsignal/web build` — passed
 - `node scripts/smoke-proposal-lifecycle.mjs` — `SMOKE_OK proposal-lifecycle`
 - `node scripts/smoke-trusted-panels.mjs` — `SMOKE_OK trusted-panels`
+- Production route sweep — 11/11 public launch routes returned HTTP 200.
 
 Follow-up shipped from this pass:
 
-- `/reports` now provides the first weekly signal report format and live beta counters.
-- `/verify` now links a machine-readable `/api/audit/export` JSON snapshot.
-- `/invites` now frames invites as an early-cohort operating loop rather than just code generation.
-- Header/footer navigation now exposes signal reports and audit export.
-- Production poll inventory checked: 43 active polls, 0 weak source/criteria rows, 0 synthetic lifecycle polls.
+- `/reports` now includes the beta invite funnel: issued, accepted, and open invites alongside poll/proposal/dispute/review metrics.
+- `/verify` links a machine-readable `/api/audit/export` JSON snapshot.
+- `/invites` frames invites as an early-cohort operating loop rather than just code generation.
+- Header/footer navigation exposes signal reports and audit export.
+- Production public routes checked: `/`, `/polls`, `/proposals`, `/methodology`, `/roadmap`, `/verify`, `/panels`, `/leaderboard`, `/archive`, `/demo`, `/reputation`.
 
 This checklist is the minimum bar before inviting a wider public beta cohort. CivicSignal is a trust product; broken trust flows are launch blockers, not cosmetic bugs.
 

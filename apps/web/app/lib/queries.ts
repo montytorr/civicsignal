@@ -432,17 +432,19 @@ export const getAuditOverview = async () => {
 
 export const getLaunchSignalReport = async () => {
   const supabase = await createClient()
-  const [polls, votes, proposals, disputes, reviews] = await Promise.all([
+  const [polls, votes, proposals, disputes, reviews, invites] = await Promise.all([
     (supabase as any).from('polls').select('status, question, source_of_truth, resolution_criteria, region, cutoff_at, resolves_at').then((r: any) => r).catch(() => ({ data: [] })),
     (supabase as any).from('votes').select('id').then((r: any) => r).catch(() => ({ data: [] })),
     (supabase as any).from('poll_proposals').select('status').then((r: any) => r).catch(() => ({ data: [] })),
     (supabase as any).from('disputes').select('status').then((r: any) => r).catch(() => ({ data: [] })),
     (supabase as any).from('dispute_reviews').select('id').then((r: any) => r).catch(() => ({ data: [] })),
+    (supabase as any).from('invites').select('used_by, used_at').then((r: any) => r).catch(() => ({ data: [] })),
   ])
 
   const pollRows = polls.data ?? []
   const proposalRows = proposals.data ?? []
   const disputeRows = disputes.data ?? []
+  const inviteRows = invites.data ?? []
 
   const weakPolls = pollRows
     .filter((p: any) => !p.source_of_truth || !p.resolution_criteria || String(p.resolution_criteria).length < 80)
@@ -465,6 +467,9 @@ export const getLaunchSignalReport = async () => {
     disputes: disputeRows.length,
     openDisputes: disputeRows.filter((d: any) => ['open', 'reviewing'].includes(d.status)).length,
     panelReviews: (reviews.data ?? []).length,
+    invitesIssued: inviteRows.length,
+    invitesAccepted: inviteRows.filter((i: any) => i.used_by || i.used_at).length,
+    invitesOpen: inviteRows.filter((i: any) => !i.used_by && !i.used_at).length,
     watchlist,
   }
 }
