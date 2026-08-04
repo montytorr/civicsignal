@@ -17,7 +17,7 @@ services:
       - trading-v2-network
     labels:
       - "traefik.enable=true"
-      - "traefik.http.routers.civicsignal.rule=Host(`civicsignal.montytorr.tech`)"
+      - "traefik.http.routers.civicsignal.rule=Host(`civicsignal.montytorr.com`)"
       - "traefik.http.routers.civicsignal.entrypoints=websecure"
       - "traefik.http.routers.civicsignal.tls.certresolver=letsencrypt"
       - "traefik.http.services.civicsignal.loadbalancer.server.port=3000"

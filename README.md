@@ -4,8 +4,8 @@
 
 Open-source verified-human civic polling for auditable public opinion signals.
 
-**Live:** https://civicsignal.montytorr.tech  
-**Status:** active pre-launch  
+**Live:** https://civicsignal.montytorr.com
+**Status:** active pre-launch
 **Category:** civic-tech
 
 ## Goal

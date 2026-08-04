@@ -124,7 +124,7 @@ try {
   await req('/rest/v1/dispute_evidence', {
     method: 'POST',
     prefer: 'return=minimal',
-    body: JSON.stringify({ dispute_id: dispute.id, submitted_by: userA, summary: 'Synthetic evidence packet for trusted panel smoke test.', source_url: 'https://civicsignal.montytorr.tech/panels' }),
+    body: JSON.stringify({ dispute_id: dispute.id, submitted_by: userA, summary: 'Synthetic evidence packet for trusted panel smoke test.', source_url: 'https://civicsignal.montytorr.com/panels' }),
   })
 
   await req('/rest/v1/dispute_reviews', {

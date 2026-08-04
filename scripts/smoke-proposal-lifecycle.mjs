@@ -110,13 +110,13 @@ try {
   await req('/rest/v1/audit_commitments', { method: 'POST', prefer: 'return=minimal', body: JSON.stringify({ poll_id: pollId, merkle_root: `smoke-root-${stamp}`, batch_type: 'vote', metadata: { type: 'smoke', proposalId: proposal.id } }) })
   await req(`/rest/v1/polls?id=eq.${pollId}`, { method: 'PATCH', prefer: 'return=minimal', body: JSON.stringify({ status: 'active' }) })
   await req('/rest/v1/votes', { method: 'POST', prefer: 'return=minimal', body: JSON.stringify({ poll_id: pollId, user_id: proposer, encrypted_answer: `sealed-${stamp}`, answer: 'Yes', receipt_hash: crypto.randomBytes(16).toString('hex') }) })
-  await req(`/rest/v1/polls?id=eq.${pollId}`, { method: 'PATCH', prefer: 'return=minimal', body: JSON.stringify({ status: 'resolved', outcome: 'Yes', resolved_at: now.toISOString(), resolved_by: admin, resolution_notes: 'Synthetic lifecycle resolution.', resolution_source_url: 'https://civicsignal.montytorr.tech/methodology' }) })
+  await req(`/rest/v1/polls?id=eq.${pollId}`, { method: 'PATCH', prefer: 'return=minimal', body: JSON.stringify({ status: 'resolved', outcome: 'Yes', resolved_at: now.toISOString(), resolved_by: admin, resolution_notes: 'Synthetic lifecycle resolution.', resolution_source_url: 'https://civicsignal.montytorr.com/methodology' }) })
   await req('/rest/v1/reputation_events', { method: 'POST', prefer: 'return=minimal', body: JSON.stringify({ poll_id: pollId, user_id: proposer, topic_id: topic.id, delta: 1 }) })
 
   await req('/rest/v1/panel_members?on_conflict=topic_id,user_id', { method: 'POST', prefer: 'resolution=merge-duplicates,return=minimal', body: JSON.stringify({ user_id: panelist, topic_id: topic.id, status: 'active', min_reputation_at_invite: 1, accepted_at: now.toISOString() }) })
   const [dispute] = await req('/rest/v1/disputes?select=id', { method: 'POST', prefer: 'return=representation', body: JSON.stringify({ poll_id: pollId, flagged_by: proposer, reason: 'Synthetic lifecycle dispute.', status: 'open' }) })
   disputeId = dispute.id
-  await req('/rest/v1/dispute_evidence', { method: 'POST', prefer: 'return=minimal', body: JSON.stringify({ dispute_id: disputeId, submitted_by: proposer, summary: 'Lifecycle smoke evidence packet.', source_url: 'https://civicsignal.montytorr.tech/verify' }) })
+  await req('/rest/v1/dispute_evidence', { method: 'POST', prefer: 'return=minimal', body: JSON.stringify({ dispute_id: disputeId, submitted_by: proposer, summary: 'Lifecycle smoke evidence packet.', source_url: 'https://civicsignal.montytorr.com/verify' }) })
   await req('/rest/v1/dispute_reviews', { method: 'POST', prefer: 'return=minimal', body: JSON.stringify({ dispute_id: disputeId, reviewer_id: panelist, decision: 'dismiss', rationale: 'Smoke panel review dismisses synthetic dispute.' }) })
   await req(`/rest/v1/disputes?id=eq.${disputeId}`, { method: 'PATCH', prefer: 'return=minimal', body: JSON.stringify({ status: 'dismissed', resolved_at: now.toISOString(), resolution_notes: 'Lifecycle smoke closed after panel review.' }) })
 

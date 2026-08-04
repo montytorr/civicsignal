@@ -1,7 +1,7 @@
 import { Resend } from 'resend'
 
-const APP_URL = process.env.NEXT_PUBLIC_APP_URL || 'https://civicsignal.montytorr.tech'
-const FROM = process.env.RESEND_FROM || 'CivicSignal <noreply@civicsignal.montytorr.tech>'
+const APP_URL = process.env.NEXT_PUBLIC_APP_URL || 'https://civicsignal.montytorr.com'
+const FROM = process.env.RESEND_FROM || 'CivicSignal <noreply@civicsignal.montytorr.com>'
 
 type EmailResult = { id?: string; error?: string }
 

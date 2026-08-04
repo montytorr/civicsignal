@@ -20,7 +20,7 @@ const ibmPlexMono = IBM_Plex_Mono({
 })
 
 export const metadata: Metadata = {
-  metadataBase: new URL(process.env.NEXT_PUBLIC_APP_URL || 'https://civicsignal.montytorr.tech'),
+  metadataBase: new URL(process.env.NEXT_PUBLIC_APP_URL || 'https://civicsignal.montytorr.com'),
   title: 'CivicSignal',
   description: 'Open-source verified-human civic polling for auditable public opinion signals.',
   openGraph: {

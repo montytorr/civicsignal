@@ -3,7 +3,7 @@ import { createServiceClient } from '@/lib/supabase-server'
 import { generateHandle } from '@/lib/handle-generator'
 import { sendConfirmationEmail } from '@/lib/email'
 
-const APP_URL = process.env.NEXT_PUBLIC_APP_URL || 'https://civicsignal.montytorr.tech'
+const APP_URL = process.env.NEXT_PUBLIC_APP_URL || 'https://civicsignal.montytorr.com'
 
 export const POST = async (req: Request) => {
   try {
