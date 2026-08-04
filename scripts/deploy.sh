@@ -48,7 +48,17 @@ if [ -n "${SUPABASE_DB_URL:-}" ]; then
   db_host=${SUPABASE_DB_URL#*@}
   db_host=${db_host%%[:/]*}
   if getent ahosts "$db_host" >/dev/null 2>&1; then
-    run_migrations=true
+    db_probe_error=$(mktemp)
+    if psql "$SUPABASE_DB_URL" -Atqc "SELECT 1" >/dev/null 2>"$db_probe_error"; then
+      run_migrations=true
+    elif grep -Eq 'ENOTFOUND.*tenant/user .* not found' "$db_probe_error"; then
+      echo "WARNING: skipping database migrations because the configured Supabase project no longer exists" >&2
+    else
+      cat "$db_probe_error" >&2
+      rm -f "$db_probe_error"
+      exit 1
+    fi
+    rm -f "$db_probe_error"
   else
     echo "WARNING: skipping database migrations because $db_host does not resolve" >&2
   fi
