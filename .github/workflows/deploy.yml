@@ -41,7 +41,7 @@ jobs:
         if: success()
         run: |
           COMMIT_MSG=$(cd /root/projects/civicsignal && git log -1 --format='%h %s')
-          BODY=$(jq -n --arg content "✅ **CivicSignal deployed** — \`${COMMIT_MSG}\`\n🌐 <https://civicsignal.montytorr.tech>" '{content:$content}')
+          BODY=$(jq -n --arg content "✅ **CivicSignal deployed** — \`${COMMIT_MSG}\`\n🌐 <https://civicsignal.montytorr.com>" '{content:$content}')
           curl -sf -X POST "$DISCORD_WEBHOOK_URL" \
             -H "Content-Type: application/json" \
             -H "User-Agent: CivicSignal-CI/1.0" \
