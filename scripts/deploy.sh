@@ -5,8 +5,15 @@ APP_DIR=${APP_DIR:-/root/projects/civicsignal}
 cd "$APP_DIR"
 
 git config --global --add safe.directory "$APP_DIR" 2>/dev/null || true
+origin_url=$(git remote get-url origin 2>/dev/null || true)
+restore_origin() {
+  if [ -n "$origin_url" ]; then
+    git remote set-url origin "$origin_url"
+  fi
+}
 if [ -n "${GITHUB_TOKEN:-}" ]; then
   git remote set-url origin "https://x-access-token:${GITHUB_TOKEN}@github.com/montytorr/civicsignal.git"
+  trap restore_origin EXIT
 fi
 
 git fetch origin main
@@ -36,7 +43,18 @@ set -a
 . "$ENV_FILE"
 set +a
 
+run_migrations=false
 if [ -n "${SUPABASE_DB_URL:-}" ]; then
+  db_host=${SUPABASE_DB_URL#*@}
+  db_host=${db_host%%[:/]*}
+  if getent ahosts "$db_host" >/dev/null 2>&1; then
+    run_migrations=true
+  else
+    echo "WARNING: skipping database migrations because $db_host does not resolve" >&2
+  fi
+fi
+
+if [ "$run_migrations" = true ]; then
   echo "Applying CivicSignal database migrations"
   psql "$SUPABASE_DB_URL" -v ON_ERROR_STOP=1 -q <<'SQL'
 CREATE TABLE IF NOT EXISTS schema_migrations (
