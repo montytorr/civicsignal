@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-APP_DIR=${APP_DIR:-/root/projects/civicsignal}
+APP_DIR=${APP_DIR:-$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)}
 cd "$APP_DIR"
 
 git config --global --add safe.directory "$APP_DIR" 2>/dev/null || true
@@ -44,23 +44,9 @@ set -a
 . "$ENV_FILE"
 set +a
 
-LOCAL_SUPABASE_ENV_FILE=${LOCAL_SUPABASE_ENV_FILE:-/srv/supabase/civic/.env}
-if [ ! -f "$LOCAL_SUPABASE_ENV_FILE" ]; then
-  echo "Missing local Supabase runtime environment" >&2
-  exit 1
-fi
-
-# The local stack owns its generated keyset. Load it only into this deployment
-# process; values are never copied into the repository or printed.
-set -a
-. "$LOCAL_SUPABASE_ENV_FILE"
-set +a
-: "${ANON_KEY:?Local Supabase ANON_KEY is required}"
-: "${SERVICE_ROLE_KEY:?Local Supabase SERVICE_ROLE_KEY is required}"
-
 NEXT_PUBLIC_SUPABASE_URL=${NEXT_PUBLIC_SUPABASE_URL_OVERRIDE:-https://civicsignal.montytorr.com/supabase}
-NEXT_PUBLIC_SUPABASE_ANON_KEY=$ANON_KEY
-SUPABASE_SERVICE_ROLE_KEY=$SERVICE_ROLE_KEY
+: "${NEXT_PUBLIC_SUPABASE_ANON_KEY:?Local Supabase anon key is required}"
+: "${SUPABASE_SERVICE_ROLE_KEY:?Local Supabase service role key is required}"
 export NEXT_PUBLIC_SUPABASE_URL NEXT_PUBLIC_SUPABASE_ANON_KEY SUPABASE_SERVICE_ROLE_KEY
 
 DB_CONTAINER=${DB_CONTAINER:-civic-supabase-db-1}

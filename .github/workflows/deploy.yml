@@ -34,7 +34,7 @@ jobs:
         id: deploy
         run: |
           set -euo pipefail
-          /root/projects/civicsignal/scripts/deploy.sh | tee /tmp/civicsignal-deploy.log
+          "$GITHUB_WORKSPACE/scripts/deploy.sh" | tee /tmp/civicsignal-deploy.log
           echo "summary=$(tail -1 /tmp/civicsignal-deploy.log)" >> "$GITHUB_OUTPUT"
 
       - name: Notify Discord success
