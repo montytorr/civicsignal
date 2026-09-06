@@ -11,7 +11,14 @@ services:
     container_name: civicsignal-web
     expose:
       - "3000"
-    env_file: /home/runner/civicsignal-secrets/web.env
+    env_file: ${CIVICSIGNAL_ENV_FILE:-/home/runner/civicsignal-secrets/web.env}
+    environment:
+      NEXT_PUBLIC_SUPABASE_URL: ${NEXT_PUBLIC_SUPABASE_URL}
+      NEXT_PUBLIC_SUPABASE_ANON_KEY: ${NEXT_PUBLIC_SUPABASE_ANON_KEY}
+      SUPABASE_SERVICE_ROLE_KEY: ${SUPABASE_SERVICE_ROLE_KEY}
+      # Database migrations run through docker exec; never retain a retired
+      # managed database URL in an application container.
+      SUPABASE_DB_URL: ""
     restart: unless-stopped
     networks:
       - trading-v2-network
@@ -35,7 +42,12 @@ services:
       dockerfile: Dockerfile.resolver
     image: civicsignal-resolver:latest
     container_name: civicsignal-resolver
-    env_file: /home/runner/civicsignal-secrets/web.env
+    env_file: ${CIVICSIGNAL_ENV_FILE:-/home/runner/civicsignal-secrets/web.env}
+    environment:
+      NEXT_PUBLIC_SUPABASE_URL: ${NEXT_PUBLIC_SUPABASE_URL}
+      NEXT_PUBLIC_SUPABASE_ANON_KEY: ${NEXT_PUBLIC_SUPABASE_ANON_KEY}
+      SUPABASE_SERVICE_ROLE_KEY: ${SUPABASE_SERVICE_ROLE_KEY}
+      SUPABASE_DB_URL: ""
     restart: unless-stopped
     networks:
       - trading-v2-network

@@ -24,6 +24,7 @@ mkdir -p apps/web/public
 [ -e apps/web/public/.gitkeep ] || touch apps/web/public/.gitkeep
 
 corepack pnpm install --frozen-lockfile
+scripts/check-local-supabase-cutover.sh
 corepack pnpm -r test
 
 # Avoid stale root-owned Next artifacts from manual smoke builds breaking the self-hosted runner.
@@ -43,63 +44,74 @@ set -a
 . "$ENV_FILE"
 set +a
 
-run_migrations=false
-if [ -n "${SUPABASE_DB_URL:-}" ]; then
-  db_host=${SUPABASE_DB_URL#*@}
-  db_host=${db_host%%[:/]*}
-  if getent ahosts "$db_host" >/dev/null 2>&1; then
-    db_probe_error=$(mktemp)
-    if psql "$SUPABASE_DB_URL" -Atqc "SELECT 1" >/dev/null 2>"$db_probe_error"; then
-      run_migrations=true
-    elif grep -Eq 'ENOTFOUND.*tenant/user .* not found' "$db_probe_error"; then
-      echo "WARNING: skipping database migrations because the configured Supabase project no longer exists" >&2
-    else
-      cat "$db_probe_error" >&2
-      rm -f "$db_probe_error"
-      exit 1
-    fi
-    rm -f "$db_probe_error"
-  else
-    echo "WARNING: skipping database migrations because $db_host does not resolve" >&2
-  fi
+LOCAL_SUPABASE_ENV_FILE=${LOCAL_SUPABASE_ENV_FILE:-/srv/supabase/civic/.env}
+if [ ! -f "$LOCAL_SUPABASE_ENV_FILE" ]; then
+  echo "Missing local Supabase runtime environment" >&2
+  exit 1
 fi
 
-if [ "$run_migrations" = true ]; then
-  echo "Applying CivicSignal database migrations"
-  psql "$SUPABASE_DB_URL" -v ON_ERROR_STOP=1 -q <<'SQL'
+# The local stack owns its generated keyset. Load it only into this deployment
+# process; values are never copied into the repository or printed.
+set -a
+. "$LOCAL_SUPABASE_ENV_FILE"
+set +a
+: "${ANON_KEY:?Local Supabase ANON_KEY is required}"
+: "${SERVICE_ROLE_KEY:?Local Supabase SERVICE_ROLE_KEY is required}"
+
+NEXT_PUBLIC_SUPABASE_URL=${NEXT_PUBLIC_SUPABASE_URL_OVERRIDE:-https://civicsignal.montytorr.com/supabase}
+NEXT_PUBLIC_SUPABASE_ANON_KEY=$ANON_KEY
+SUPABASE_SERVICE_ROLE_KEY=$SERVICE_ROLE_KEY
+export NEXT_PUBLIC_SUPABASE_URL NEXT_PUBLIC_SUPABASE_ANON_KEY SUPABASE_SERVICE_ROLE_KEY
+
+DB_CONTAINER=${DB_CONTAINER:-civic-supabase-db-1}
+if ! docker inspect "$DB_CONTAINER" >/dev/null 2>&1; then
+  echo "Missing local CivicSignal database container" >&2
+  exit 1
+fi
+if ! docker exec "$DB_CONTAINER" psql -X -U postgres -d postgres -Atqc "SELECT 1" >/dev/null; then
+  echo "Local CivicSignal database probe failed" >&2
+  exit 1
+fi
+
+echo "Applying CivicSignal database migrations"
+docker exec -i "$DB_CONTAINER" psql -X -U postgres -d postgres -v ON_ERROR_STOP=1 -q <<'SQL'
 CREATE TABLE IF NOT EXISTS schema_migrations (
   filename text PRIMARY KEY,
   applied_at timestamptz NOT NULL DEFAULT now()
 );
 SQL
 
-  # Production predates the migration ledger. If the core schema already exists but
-  # the ledger is empty, mark current migrations as applied instead of replaying
-  # years of CREATE POLICY noise on every deploy.
-  ledger_count=$(psql "$SUPABASE_DB_URL" -Atqc "SELECT count(*) FROM schema_migrations")
-  core_schema_exists=$(psql "$SUPABASE_DB_URL" -Atqc "SELECT to_regclass('public.polls') IS NOT NULL")
-  if [ "$ledger_count" = "0" ] && [ "$core_schema_exists" = "t" ]; then
-    echo "Bootstrapping migration ledger from existing production schema"
-    for migration in packages/db/migrations/*.sql; do
-      filename=$(basename "$migration")
-      psql "$SUPABASE_DB_URL" -v ON_ERROR_STOP=1 -q \
-        -c "INSERT INTO schema_migrations(filename) VALUES ('$filename') ON CONFLICT DO NOTHING"
-    done
+# The fresh local database was seeded before the ledger existed. Bootstrap the
+# ledger only when the complete tracked schema is already present.
+ledger_count=$(docker exec "$DB_CONTAINER" psql -X -U postgres -d postgres -Atqc "SELECT count(*) FROM schema_migrations")
+core_schema_exists=$(docker exec "$DB_CONTAINER" psql -X -U postgres -d postgres -Atqc "SELECT to_regclass('public.polls') IS NOT NULL")
+if [ "$ledger_count" = "0" ] && [ "$core_schema_exists" = "t" ]; then
+  schema_contract_count=$(docker exec "$DB_CONTAINER" psql -X -U postgres -d postgres -Atqc \
+    "SELECT count(*) FROM information_schema.tables WHERE table_schema = 'public' AND table_name IN ('audit_commitments','dispute_evidence','dispute_reviews','disputes','invites','panel_members','poll_proposals','polls','profiles','reputation_events','source_templates','topics','user_topic_reputation','votes')")
+  if [ "$schema_contract_count" != "14" ]; then
+    echo "Refusing to bootstrap migration ledger from an incomplete local schema" >&2
+    exit 1
   fi
-
+  echo "Bootstrapping migration ledger from existing local schema"
   for migration in packages/db/migrations/*.sql; do
     filename=$(basename "$migration")
-    already_applied=$(psql "$SUPABASE_DB_URL" -Atqc "SELECT EXISTS (SELECT 1 FROM schema_migrations WHERE filename = '$filename')")
-    if [ "$already_applied" = "t" ]; then
-      echo "Skipping migration $filename"
-      continue
-    fi
-    echo "Applying migration $filename"
-    psql "$SUPABASE_DB_URL" -v ON_ERROR_STOP=1 -f "$migration"
-    psql "$SUPABASE_DB_URL" -v ON_ERROR_STOP=1 -q \
+    docker exec "$DB_CONTAINER" psql -X -U postgres -d postgres -v ON_ERROR_STOP=1 -q \
       -c "INSERT INTO schema_migrations(filename) VALUES ('$filename') ON CONFLICT DO NOTHING"
   done
 fi
+
+for migration in packages/db/migrations/*.sql; do
+  filename=$(basename "$migration")
+  already_applied=$(docker exec "$DB_CONTAINER" psql -X -U postgres -d postgres -Atqc "SELECT EXISTS (SELECT 1 FROM schema_migrations WHERE filename = '$filename')")
+  if [ "$already_applied" = "t" ]; then
+    echo "Skipping migration $filename"
+    continue
+  fi
+  echo "Applying migration $filename"
+  docker exec -i "$DB_CONTAINER" psql -X -U postgres -d postgres -v ON_ERROR_STOP=1 -f - < "$migration"
+  docker exec "$DB_CONTAINER" psql -X -U postgres -d postgres -v ON_ERROR_STOP=1 -q \
+    -c "INSERT INTO schema_migrations(filename) VALUES ('$filename') ON CONFLICT DO NOTHING"
+done
 
 corepack pnpm --filter @civicsignal/web build
 
