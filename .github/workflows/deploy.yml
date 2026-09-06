@@ -43,7 +43,7 @@ jobs:
       - name: Notify Discord success
         if: success()
         run: |
-          COMMIT_MSG=$(cd /root/projects/civicsignal && git log -1 --format='%h %s')
+          COMMIT_MSG=$(git -C "$GITHUB_WORKSPACE" log -1 --format='%h %s')
           BODY=$(jq -n --arg content "✅ **CivicSignal deployed** — \`${COMMIT_MSG}\`\n🌐 <https://civicsignal.montytorr.com>" '{content:$content}')
           curl -sf -X POST "$DISCORD_WEBHOOK_URL" \
             -H "Content-Type: application/json" \
@@ -53,7 +53,7 @@ jobs:
       - name: Notify Discord failure
         if: failure()
         run: |
-          COMMIT_MSG=$(cd /root/projects/civicsignal && git log -1 --format='%h %s' 2>/dev/null || echo "unknown")
+          COMMIT_MSG=$(git -C "$GITHUB_WORKSPACE" log -1 --format='%h %s' 2>/dev/null || echo "unknown")
           BODY=$(jq -n --arg content "❌ **CivicSignal deploy FAILED** — \`${COMMIT_MSG}\`\nCheck: <https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}>" '{content:$content}')
           curl -sf -X POST "$DISCORD_WEBHOOK_URL" \
             -H "Content-Type: application/json" \

@@ -20,5 +20,9 @@ rg -q 'docker exec.*\bpsql\b' scripts/deploy.sh
 rg -q 'NEXT_PUBLIC_SUPABASE_URL_OVERRIDE.*civicsignal\.montytorr\.com/supabase' scripts/deploy.sh
 rg -q 'uses: actions/checkout@v4' .github/workflows/deploy.yml
 rg -q '\$GITHUB_WORKSPACE/scripts/deploy\.sh' .github/workflows/deploy.yml
+if rg -q '/root/projects/civicsignal' .github/workflows/deploy.yml; then
+  echo "workflow must not depend on the root-only repository path" >&2
+  exit 1
+fi
 
 echo "local Supabase cutover contract verified"
